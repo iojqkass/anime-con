@@ -121,6 +121,36 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .tab-item .tab-label{font-size:10px;font-weight:600;color:var(--text3);white-space:nowrap}
 .tab-item.active .tab-label{color:var(--pink-500)}
 .tab-item.active .tab-icon{transform:scale(1.12)}
+
+/* Hot COS rows */
+.coser-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:14px;background:var(--card);border-radius:var(--r-md);padding:10px 0 10px 10px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.coser-row .coser-row-info{flex-shrink:0;width:70px;display:flex;flex-direction:column;justify-content:center;padding-right:6px}
+.coser-row .coser-row-info h4{font-size:13px;font-weight:700;line-height:1.3;margin-bottom:2px}
+.coser-row .coser-row-info .coser-row-meta{font-size:9px;color:var(--text3);line-height:1.3}
+.coser-row .coser-thumb-scroll{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding-right:10px;scrollbar-width:none}
+.coser-row .coser-thumb-scroll::-webkit-scrollbar{display:none}
+.coser-thumb{width:120px;height:180px;border-radius:var(--r-xs);flex-shrink:0;overflow:hidden;cursor:pointer;position:relative;border:2px solid transparent;transition:border-color .15s}
+.coser-thumb:active{border-color:var(--pink-400)}
+.coser-thumb img{width:100%;height:100%;object-fit:cover}
+.coser-row .coser-count{font-size:9px;color:var(--pink-500);font-weight:600;margin-top:2px}
+
+/* Lightbox */
+.lightbox-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;display:flex;align-items:center;justify-content:center;animation:lbFadeIn .2s ease}
+@keyframes lbFadeIn{from{opacity:0}to{opacity:1}}
+.lightbox-overlay .lb-close{position:absolute;top:16px;right:20px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;border:none;line-height:1}
+.lightbox-overlay .lb-arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;border:none;transition:background .15s}
+.lightbox-overlay .lb-arrow:active{background:rgba(255,255,255,.25)}
+.lightbox-overlay .lb-arrow.prev{left:12px}
+.lightbox-overlay .lb-arrow.next{right:12px}
+.lightbox-overlay .lb-counter{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.6);font-size:13px;font-weight:600;z-index:10}
+.lightbox-overlay .lb-img-wrap{max-width:90vw;max-height:80vh;display:flex;align-items:center;justify-content:center}
+.lightbox-overlay .lb-img-wrap img{max-width:90vw;max-height:80vh;object-fit:contain;border-radius:4px;user-select:none;-webkit-user-drag:none}
+
+/* Weather refresh button */
+.weather-refresh{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:14px;border:1px solid var(--border);background:var(--card);color:var(--pink-500);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
+.weather-refresh:active{background:var(--pink-100);transform:scale(.96)}
+.weather-loading{text-align:center;padding:20px;color:var(--text2);font-size:13px}
+.weather-error{text-align:center;padding:16px;color:#c0392b;font-size:12px;background:rgba(255,107,107,.06);border-radius:var(--r-sm);margin-bottom:12px}
 </style>
 </head>
 <body>
@@ -215,70 +245,19 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 <div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=龙族','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_020.jpg)"></div><span class="cover-badge">国创</span></div><div class="anime-info"><h3>龙族 动画第三季</h3><div class="anime-meta">9.1 · 奇幻/冒险 · 国产 · 暑期</div><div class="anime-desc">路明非觉醒，卡塞尔学院史上最强S级新生。江南原著动画化巅峰之作。</div><div class="anime-tags"><span class="topic-tag">奇幻</span><span class="topic-tag">国产</span><span class="topic-tag">龙族</span></div></div></div>
 </div>
 
-<!-- PAGE 4: Coser -->
+<!-- PAGE 4: Hot COS -->
 <div class="page" id="page-coser">
-<div class="section-header"><h2>COSER 分享</h2><span class="see-all">近3个月</span></div>
-<div class="coser-grid">
-<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/coser_01.jpg)"></div><span class="img-tag">热门</span></div><div class="coser-info"><h4>雷电将军 · 诸愿百眼之轮</h4><div class="coser-meta">墨泽 · 《原神》· 萤火虫漫展</div></div></div>
-<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/coser_02.jpg)"></div><span class="img-tag">精选</span></div><div class="coser-info"><h4>流萤 · 星核猎手</h4><div class="coser-meta">故里 · 《崩坏：星穹铁道》</div></div></div>
-<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/coser_03.jpg)"></div></div><div class="coser-info"><h4>五条悟 · 无量空处</h4><div class="coser-meta">七煞 · 《咒术回战》· 成都世界线</div></div></div>
-<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/coser_04.jpg)"></div><span class="img-tag">可爱</span></div><div class="coser-info"><h4>甘露寺蜜璃 · 恋之呼吸</h4><div class="coser-meta">大野茶 · 《鬼灭之刃》· 萤火虫</div></div></div>
-<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/coser_05.jpg)"></div></div><div class="coser-info"><h4>能天使 · 企鹅物流</h4><div class="coser-meta">池鱼 · 《明日方舟》· CICF</div></div></div>
-<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/coser_06.jpg)"></div><span class="img-tag">推荐</span></div><div class="coser-info"><h4>芙莉莲 · 千年之旅</h4><div class="coser-meta">不鱼 · 《葬送的芙莉莲》</div></div></div>
-<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/coser_07.jpg)"></div></div><div class="coser-info"><h4>灶门炭治郎 · 火之神乐</h4><div class="coser-meta">刀刀 · 《鬼灭之刃》· 萤火虫</div></div></div>
-<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/coser_08.jpg)"></div></div><div class="coser-info"><h4>神里绫华 · 白鹭霜华</h4><div class="coser-meta">离离 · 《原神》· 梦乡漫展</div></div></div>
-<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/coser_09.jpg)"></div></div><div class="coser-info"><h4>镜流 · 剑首</h4><div class="coser-meta">氧氧 · 《崩坏：星穹铁道》</div></div></div>
-<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/coser_10.jpg)"></div><span class="img-tag">人气</span></div><div class="coser-info"><h4>八重神子 · 鸣神大社</h4><div class="coser-meta">沧鬼 · 《原神》· KKWorld</div></div></div>
-<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/coser_11.jpg)"></div></div><div class="coser-info"><h4>胡桃 · 往生堂</h4><div class="coser-meta">三吉 · 《原神》· BW2026</div></div></div>
-<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/coser_12.jpg)"></div></div><div class="coser-info"><h4>珊瑚宫心海 · 海祇岛</h4><div class="coser-meta">曲曲 · 《原神》· 世界线</div></div></div>
-</div></div>
+<div class="section-header"><h2>热门COS</h2></div>
+<div id="coserRows"></div>
+</div>
 
 <!-- PAGE 5: Weather + Cos Recommend -->
 <div class="page" id="page-weather">
-<div class="section-header"><h2>推荐COS</h2><span class="location-badge">📍 上海</span></div>
+<div class="section-header"><h2>推荐COS</h2><span class="location-badge" id="locBadge">📍 定位中...</span></div>
 
-<!-- 上海7天天气卡片 -->
-<div class="weather-panel">
-<div class="weather-city">📍 上海 · 实时天气（7月7日 出梅首日）</div>
-<div class="weather-temp">36°</div>
-<div class="weather-desc">多云 午后雷阵雨 ⛈</div>
-<div class="weather-detail"><span>湿度 65%-90%</span><span>偏南风 4-5级</span><span>AQI 39 优</span></div>
-<div class="forecast-row">
-<div class="forecast-day"><div class="day-name">今日</div><div class="day-icon">⛈</div><div class="day-temp">36°/27°</div></div>
-<div class="forecast-day"><div class="day-name">周三</div><div class="day-icon">🌧</div><div class="day-temp">35°/27°</div></div>
-<div class="forecast-day"><div class="day-name">周四</div><div class="day-icon">☁️</div><div class="day-temp">33°/25°</div></div>
-<div class="forecast-day"><div class="day-name">周五</div><div class="day-icon">☁️</div><div class="day-temp">32°/26°</div></div>
-<div class="forecast-day"><div class="day-name">周六</div><div class="day-icon">🌧</div><div class="day-temp">29°/26°</div></div>
-<div class="forecast-day"><div class="day-name">周日</div><div class="day-icon">🌧</div><div class="day-temp">30°/27°</div></div>
-<div class="forecast-day"><div class="day-name">周一</div><div class="day-icon">🌧</div><div class="day-temp">31°/27°</div></div>
-</div>
-<div class="weather-alert">
-<strong>⚠️ 高温+台风双预警 · 上海7月7日正式出梅</strong>
-今日出梅首日最高36℃，午后局部雷阵雨。超强台风「巴威」（17级以上，中心气压915hPa）正以25-30km/h向偏西移动，预计7月10日起影响东部海域。周末多阵雨+东南大风，气温回落至29-30℃。BW2026期间（7/10-12）有风雨影响，建议携带雨具和薄外套！
-</div>
-</div>
-
-<!-- 天气推荐COS角色 -->
-<div class="section-header"><h2>⛈ 上海36℃+雷阵雨 · 推荐出展COS角色</h2></div>
-<div id="cosRecommendList">
-
-<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url(images/cos_rec_001.jpg)"></div><span class="rec-match">雷神降临</span></div><div class="rec-info"><h4>雷电将军</h4><div class="rec-series">原神 · 稻妻雷神</div><div class="rec-desc">36℃高温+午后雷阵雨？雷神COS简直是天选！紫电霸气全开，雷雨天气自带天然特效，诸愿百眼之轮配上雷电交加，出片率爆表。</div></div></div>
-
-<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url(images/cos_rec_002.jpg)"></div><span class="rec-match">夏日活力</span></div><div class="rec-info"><h4>能天使</h4><div class="rec-series">明日方舟 · 企鹅物流</div><div class="rec-desc">红色外套+短裤=夏天的答案！轻便不闷热，天使光环出片率炸裂。元气人设和BW2026的狂欢氛围绝配，逛展机动性满分。</div></div></div>
-
-<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url(images/cos_rec_003.jpg)"></div><span class="rec-match">热门之选</span></div><div class="rec-info"><h4>灶门炭治郎</h4><div class="rec-series">鬼灭之刃 · 水之呼吸</div><div class="rec-desc">无限城篇7/28上线Netflix！鬼杀队队服透气性好，绿色格子羽织辨识度拉满。带上日轮刀和水之呼吸，BW现场绝对被集邮到手软。</div></div></div>
-
-<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url(images/cos_rec_004.jpg)"></div><span class="rec-match">周末防雨</span></div><div class="rec-info"><h4>富冈义勇</h4><div class="rec-series">鬼灭之刃 · 水柱</div><div class="rec-desc">周末台风+阵雨来袭！水柱义勇自带水属性Buff，蓝色羽织+沉默气质在风雨中天然出片。雨水珠挂在日轮刀上，氛围感直接拉满。</div></div></div>
-
-<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url(images/cos_rec_005.jpg)"></div><span class="rec-match">台风预警</span></div><div class="rec-info"><h4>镜流</h4><div class="rec-series">崩坏：星穹铁道 · 前剑首</div><div class="rec-desc">台风「巴威」逼近！白发剑首冰属性气场全开，长发在大风中自带动态特效。降魔阴身状态+雷雨天气=史诗级正片现场。</div></div></div>
-
-<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url(images/cos_rec_006.jpg)"></div><span class="rec-match">雨中出片</span></div><div class="rec-info"><h4>珊瑚宫心海</h4><div class="rec-series">原神 · 海祇岛巫女</div><div class="rec-desc">水元素法器+蓝白宫廷风，雨天COS水巫女氛围感直接封顶！周末阵雨连连，水珠点缀珍珠发饰，每一帧都是壁纸级正片。</div></div></div>
-
-<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url(images/cos_rec_007.jpg)"></div><span class="rec-match">室内首选</span></div><div class="rec-info"><h4>钟离</h4><div class="rec-series">原神 · 岩王帝君</div><div class="rec-desc">BW2026室内场馆空调给力！西装铠甲沉稳优雅，岩神护盾气场拉满。台风天逛展首选，举手投足都是帝王级正片质感。</div></div></div>
-
-<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url(images/cos_rec_008.jpg)"></div><span class="rec-match">人气爆款</span></div><div class="rec-info"><h4>胡桃</h4><div class="rec-series">原神 · 往生堂堂主</div><div class="rec-desc">短装+帽子的轻便组合，36℃高温也毫无压力！古灵精怪人设随手出片，蝴蝶特效加倍。BW2026现场被集邮率Top3预定。</div></div></div>
-
-</div>
+<div id="weatherPanel"></div>
+<div class="section-header" id="recTitle"><h2>推荐出展COS角色</h2></div>
+<div id="cosRecommendList"></div>
 </div>
 
 </div>
@@ -288,36 +267,365 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 <div class="tab-item" data-page="expo" onclick="switchTab('expo',this)"><div class="tab-icon">📅</div><span class="tab-label">漫展概览</span></div>
 <div class="tab-item" data-page="topic" onclick="switchTab('topic',this)"><div class="tab-icon">💬</div><span class="tab-label">热门话题</span></div>
 <div class="tab-item" data-page="anime" onclick="switchTab('anime',this)"><div class="tab-icon">🎬</div><span class="tab-label">热番推荐</span></div>
-<div class="tab-item" data-page="coser" onclick="switchTab('coser',this)"><div class="tab-icon">📸</div><span class="tab-label">COSER</span></div>
+<div class="tab-item" data-page="coser" onclick="switchTab('coser',this)"><div class="tab-icon">📸</div><span class="tab-label">热门COS</span></div>
 <div class="tab-item" data-page="weather" onclick="switchTab('weather',this)"><div class="tab-icon">🌤</div><span class="tab-label">推荐COS</span></div>
 </div>
 
 <script>
+// ========== Tab Switching ==========
 function switchTab(id,el){
   document.querySelectorAll('.tab-item').forEach(function(t){t.classList.remove('active')});
   el.classList.add('active');
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
   var p=document.getElementById('page-'+id);
   if(p){p.classList.add('active');document.getElementById('mainContent').scrollTop=0}
+  if(id==='coser')initCoserPage();
+  if(id==='weather')initWeatherPage();
 }
-// 懒加载图片：用 IntersectionObserver 按需加载 background-image
-(function(){
-  var observer=new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(e.isIntersecting){
-        var bg=e.target.getAttribute('data-bg');
-        if(bg){e.target.style.backgroundImage='url('+bg+')';e.target.removeAttribute('data-bg')}
-        observer.unobserve(e.target)
-      }
-    })
-  },{rootMargin:'200px'});
-  document.addEventListener('DOMContentLoaded',function(){
-    document.querySelectorAll('[style*="background-image:url(images/"]').forEach(function(el){
-      var m=el.style.backgroundImage.match(/url\(([^)]+)\)/);
-      if(m){el.setAttribute('data-bg',m[1]);el.style.backgroundImage='';observer.observe(el)}
-    })
-  })
-})();
+
+// ========== COSER Page ==========
+var coserData=[
+  {id:'01',name:'雷电将军',meta:'原神 · 稻妻雷神 · 墨泽',imgs:[]},
+  {id:'02',name:'流萤',meta:'崩坏:星穹铁道 · 星核猎手 · 故里',imgs:[]},
+  {id:'03',name:'五条悟',meta:'咒术回战 · 最强咒术师 · 七煞',imgs:[]},
+  {id:'04',name:'甘露寺蜜璃',meta:'鬼灭之刃 · 恋柱 · 大野茶',imgs:[]},
+  {id:'05',name:'能天使',meta:'明日方舟 · 企鹅物流 · 池鱼',imgs:[]},
+  {id:'06',name:'芙莉莲',meta:'葬送的芙莉莲 · 千年魔法使 · 不鱼',imgs:[]},
+  {id:'07',name:'灶门炭治郎',meta:'鬼灭之刃 · 日之呼吸 · 刀刀',imgs:[]},
+  {id:'08',name:'神里绫华',meta:'原神 · 社奉行 · 离离',imgs:[]},
+  {id:'09',name:'镜流',meta:'崩坏:星穹铁道 · 前剑首 · 氧氧',imgs:[]},
+  {id:'10',name:'八重神子',meta:'原神 · 鸣神大社 · 沧鬼',imgs:[]},
+  {id:'11',name:'胡桃',meta:'原神 · 往生堂 · 三吉',imgs:[]},
+  {id:'12',name:'珊瑚宫心海',meta:'原神 · 海祇岛 · 曲曲',imgs:[]}
+];
+
+// Probe actual image files
+function probeImages(callback){
+  var remaining=coserData.length;
+  coserData.forEach(function(c){
+    c.imgs=[];
+    var checked=0, found=0;
+    function checkNext(i){
+      if(found>=7||checked>=7){if(--remaining===0&&callback)callback();return}
+      var idx=i||1;
+      var src='images/coser_'+c.id+'_'+idx+'.jpg';
+      var img=new Image();
+      img.onload=function(){
+        c.imgs.push(src);found++;checked++;checkNext(idx+1);
+      };
+      img.onerror=function(){
+        checked++;
+        if(found===0&&idx<=7)checkNext(idx+1);
+        else{if(--remaining===0&&callback)callback()}
+      };
+      img.src=src;
+    }
+    checkNext(1);
+  });
+}
+
+var coserInited=false, coserUpdating=false;
+function initCoserPage(){
+  if(coserUpdating)return;
+  var container=document.getElementById('coserRows');
+  if(!container)return;
+  if(coserInited&&container.children.length>0)return;
+
+  coserUpdating=true;
+  container.innerHTML='<div class="weather-loading">加载中...</div>';
+  probeImages(function(){
+    var html='';
+    coserData.forEach(function(c){
+      if(c.imgs.length===0)return;
+      html+='<div class="coser-row">';
+      html+='<div class="coser-row-info"><h4>'+c.name+'</h4><div class="coser-row-meta">'+c.meta+'</div><div class="coser-count">'+c.imgs.length+'张</div></div>';
+      html+='<div class="coser-thumb-scroll" data-coser="'+c.id+'">';
+      c.imgs.forEach(function(src,idx){
+        html+='<div class="coser-thumb" data-idx="'+idx+'" data-src="'+src+'" onclick="openLightbox(\''+c.id+'\','+idx+')"><img src="'+src+'" alt="'+c.name+'" loading="lazy"></div>';
+      });
+      html+='</div></div>';
+    });
+    container.innerHTML=html;
+    coserInited=true;
+    coserUpdating=false;
+  });
+}
+
+// ========== Lightbox ==========
+var lbData=null, lbIdx=0, lbTouchStart=0;
+function openLightbox(coserId,idx){
+  var c=coserData.find(function(x){return x.id===coserId});
+  if(!c)return;
+  lbData=c;lbIdx=idx;
+  renderLightbox();
+}
+
+function renderLightbox(){
+  var overlay=document.getElementById('lightboxOverlay');
+  if(overlay)overlay.remove();
+  var c=lbData;
+  overlay=document.createElement('div');
+  overlay.className='lightbox-overlay';
+  overlay.id='lightboxOverlay';
+  overlay.innerHTML=
+    '<button class="lb-close" onclick="closeLightbox(event)">&times;</button>'+
+    (lbIdx>0?'<button class="lb-arrow prev" onclick="lbNav(-1,event)">&#8249;</button>':'')+
+    (lbIdx<c.imgs.length-1?'<button class="lb-arrow next" onclick="lbNav(1,event)">&#8250;</button>':'')+
+    '<div class="lb-img-wrap"><img src="'+c.imgs[lbIdx]+'" alt="'+c.name+'" id="lbImg"></div>'+
+    '<div class="lb-counter">'+(lbIdx+1)+' / '+c.imgs.length+'</div>';
+  overlay.addEventListener('click',function(e){if(e.target===overlay)closeLightbox();});
+  overlay.addEventListener('touchstart',function(e){lbTouchStart=e.touches[0].clientX});
+  overlay.addEventListener('touchend',function(e){
+    var dx=e.changedTouches[0].clientX-lbTouchStart;
+    if(Math.abs(dx)>60){lbNav(dx<0?1:-1)}
+  });
+  document.body.appendChild(overlay);
+}
+
+function closeLightbox(e){
+  if(e)e.stopPropagation();
+  var o=document.getElementById('lightboxOverlay');
+  if(o)o.remove();
+}
+
+function lbNav(dir,e){
+  if(e)e.stopPropagation();
+  var nidx=lbIdx+dir;
+  if(nidx>=0&&nidx<lbData.imgs.length){lbIdx=nidx;renderLightbox()}
+}
+
+// ========== WEATHER Page ==========
+var weatherInited=false;
+
+function initWeatherPage(){
+  if(weatherInited)return;
+  weatherInited=true;
+  var panel=document.getElementById('weatherPanel');
+  var badge=document.getElementById('locBadge');
+  if(!panel||!badge)return;
+  panel.innerHTML='<div class="weather-loading">正在获取定位...</div>';
+
+  // Try geolocation
+  if(!navigator.geolocation){
+    fallbackWeather();
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    function(pos){fetchWeather(pos.coords.latitude,pos.coords.longitude)},
+    function(err){console.log('Geolocation denied:',err.message);fallbackWeather()},
+    {timeout:8000,maximumAge:600000}
+  );
+}
+
+function fetchWeather(lat,lon){
+  var panel=document.getElementById('weatherPanel');
+  var badge=document.getElementById('locBadge');
+  // Try OpenWeatherMap first
+  var owmKey='9de243494c0b29563b1e8d1e7f3e5a7c'; // free tier demo key
+  var owmUrl='https://api.openweathermap.org/data/2.5/weather?lat='+lat+'&lon='+lon+'&appid='+owmKey+'&units=metric&lang=zh_cn';
+  fetch(owmUrl).then(function(r){return r.json()}).then(function(d){
+    if(d.cod===200){
+      badge.innerHTML='📍 '+d.name;
+      renderWeatherPanel(d,d.name,true);
+      renderRecommendations(d);
+    }else{
+      fetchWttr(lat,lon);
+    }
+  }).catch(function(){fetchWttr(lat,lon)});
+}
+
+function fetchWttr(lat,lon){
+  fetch('https://wttr.in/'+lat+','+lon+'?format=j1').then(function(r){return r.json()}).then(function(d){
+    var cur=d.current_condition[0];
+    var city=d.nearest_area[0].areaName[0].value||'当前城市';
+    document.getElementById('locBadge').innerHTML='📍 '+city;
+    var w={main:{temp:parseFloat(cur.temp_C)},weather:[{description:cur.lang_zh[0].value}],wind:{speed:parseFloat(cur.windspeedKmph)/3.6},main2:{humidity:cur.humidity},name:city};
+    renderWeatherPanel(w,city,false);
+    renderRecommendations(w);
+  }).catch(function(){fallbackWeather()});
+}
+
+function fallbackWeather(){
+  document.getElementById('locBadge').innerHTML='📍 上海（默认）';
+  var panel=document.getElementById('weatherPanel');
+  panel.innerHTML=
+    '<div class="weather-panel">'+
+    '<div class="weather-city">📍 上海 · 实时天气（7月7日 出梅首日）</div>'+
+    '<div class="weather-temp">36°</div>'+
+    '<div class="weather-desc">多云 午后雷阵雨 ⛈</div>'+
+    '<div class="weather-detail"><span>湿度 65%-90%</span><span>偏南风 4-5级</span><span>AQI 39 优</span></div>'+
+    '<div class="forecast-row">'+
+    '<div class="forecast-day"><div class="day-name">今日</div><div class="day-icon">⛈</div><div class="day-temp">36°/27°</div></div>'+
+    '<div class="forecast-day"><div class="day-name">周三</div><div class="day-icon">🌧</div><div class="day-temp">35°/27°</div></div>'+
+    '<div class="forecast-day"><div class="day-name">周四</div><div class="day-icon">☁️</div><div class="day-temp">33°/25°</div></div>'+
+    '<div class="forecast-day"><div class="day-name">周五</div><div class="day-icon">☁️</div><div class="day-temp">32°/26°</div></div>'+
+    '<div class="forecast-day"><div class="day-name">周六</div><div class="day-icon">🌧</div><div class="day-temp">29°/26°</div></div>'+
+    '<div class="forecast-day"><div class="day-name">周日</div><div class="day-icon">🌧</div><div class="day-temp">30°/27°</div></div>'+
+    '<div class="forecast-day"><div class="day-name">周一</div><div class="day-icon">🌧</div><div class="day-temp">31°/27°</div></div>'+
+    '</div></div>';
+  document.getElementById('recTitle').innerHTML='<h2>⛈ 上海36℃+雷阵雨 · 推荐出展COS角色</h2>';
+  renderDefaultRecommendations();
+}
+
+function getWeatherIcon(code,isOWM){
+  if(isOWM){
+    var map={200:'⛈',201:'⛈',202:'⛈',210:'⛈',211:'⛈',212:'⛈',221:'⛈',230:'⛈',231:'⛈',232:'⛈',300:'🌦',301:'🌦',302:'🌦',310:'🌦',311:'🌦',312:'🌦',313:'🌦',314:'🌦',321:'🌦',500:'🌧',501:'🌧',502:'🌧',503:'🌧',504:'🌧',511:'🌧',520:'🌧',521:'🌧',522:'🌧',531:'🌧',600:'❄️',601:'❄️',602:'❄️',611:'🌨',612:'🌨',613:'🌨',615:'🌨',616:'🌨',620:'🌨',621:'🌨',622:'🌨',701:'🌫',711:'🌫',721:'🌫',731:'🌫',741:'🌫',751:'🌫',761:'🌫',762:'🌫',771:'🌫',781:'🌫',800:'☀️',801:'🌤',802:'⛅',803:'☁️',804:'☁️'};
+    return map[code]||'🌤';
+  }
+  return '🌤';
+}
+
+function renderWeatherPanel(w,city,isOWM){
+  var temp=Math.round(w.main.temp);
+  var desc=w.weather[0].description;
+  var icon=getWeatherIcon(w.weather[0].id,isOWM);
+  var wind=w.wind.speed;
+  var hum=w.main2?w.main2.humidity:(w.main.humidity||'--');
+  var panel=document.getElementById('weatherPanel');
+  panel.innerHTML=
+    '<div class="weather-panel">'+
+    '<div class="weather-city">📍 '+city+' · 实时天气</div>'+
+    '<div class="weather-temp">'+temp+'°</div>'+
+    '<div class="weather-desc">'+icon+' '+desc+'</div>'+
+    '<div class="weather-detail"><span>温度 '+temp+'°C</span><span>风力 '+wind.toFixed(1)+' m/s</span><span>湿度 '+hum+'%</span></div>'+
+    '<button class="weather-refresh" onclick="refreshWeather()" style="margin-top:10px">🔄 刷新定位</button>'+
+    '</div>';
+  document.getElementById('recTitle').innerHTML='<h2>'+icon+' '+city+' '+temp+'°C '+desc+' · 推荐出展COS角色</h2>';
+}
+
+function refreshWeather(){
+  weatherInited=false;
+  document.getElementById('weatherPanel').innerHTML='<div class="weather-loading">正在重新定位...</div>';
+  document.getElementById('cosRecommendList').innerHTML='';
+  initWeatherPage();
+}
+
+// ========== Dynamic Recommendations ==========
+var recBase=[
+  {name:'雷电将军',series:'原神 · 稻妻雷神',img:'images/cos_rec_001.jpg',
+   hot:'紫电霸气全开，雷雨天气自带天然特效，诸愿百眼之轮配上雷电交加，出片率爆表。',
+   rain:'雷神降临！雷雨天气天然特效加持，诸愿百眼之轮在雨中格外震撼，出片率爆表。',
+   wind:'紫电划破长空！大风吹起长发与披风，雷电将军威严气场全开。',
+   cloudy:'紫色礼服提亮阴天画面！诸愿百眼之轮在柔和光线下更显质感。',
+   default:'紫电霸气全开，雷雨天气自带天然特效，诸愿百眼之轮配上雷电交加，出片率爆表。'},
+  {name:'能天使',series:'明日方舟 · 企鹅物流',img:'images/cos_rec_002.jpg',
+   hot:'红色外套+短裤=高温天的答案！轻便不闷热，天使光环出片率炸裂，逛展机动性满分。',
+   rain:'雨中也欢乐！红色外套在雨水中格外鲜艳，天使光环配雨滴别有风味。',
+   wind:'红色外套在风中猎猎作响！天使光环迎风而立，活力满满。',
+   cloudy:'亮红配色提亮阴天！天使光环+元气笑容，阴天也阳光灿烂。',
+   default:'红色外套+短裤=夏天的答案！轻便不闷热，天使光环出片率炸裂。'},
+  {name:'灶门炭治郎',series:'鬼灭之刃 · 水之呼吸',img:'images/cos_rec_003.jpg',
+   hot:'鬼杀队队服透气性好，绿色格子羽织辨识度拉满。轻装上阵逛展不累。',
+   rain:'水之呼吸！雨中挥刀水花四溅，绿色羽织在雨中更显沉稳气质。',
+   wind:'风中舞刀！绿色羽织随风飘扬，火之神乐姿态张力拉满。',
+   cloudy:'绿黑配色经典耐看，日轮刀在柔和光线下质感出众。',
+   default:'无限城篇7/28上线！鬼杀队队服透气性好，绿色格子羽织辨识度拉满。'},
+  {name:'富冈义勇',series:'鬼灭之刃 · 水柱',img:'images/cos_rec_004.jpg',
+   hot:'水蓝色羽织视觉降温！沉默高冷人设自带清凉气场，高温天也从容。',
+   rain:'水柱本命天气！蓝色羽织+雨水珠挂在日轮刀上，氛围感拉满。',
+   wind:'沉默的剑士在风中伫立，蓝色羽织翻飞如水波荡漾。',
+   cloudy:'蓝色羽织在阴天格外清冷高级，水柱气质完美呈现。',
+   default:'水柱义勇自带水属性Buff，蓝色羽织+沉默气质天然出片。'},
+  {name:'镜流',series:'崩坏:星穹铁道 · 前剑首',img:'images/cos_rec_005.jpg',
+   hot:'冰属性气场降温！白发冷艳自带清凉感，高温天看冰美人最舒服。',
+   rain:'雨中剑首更显凌厉！冰属性+雨水，每一帧都是壁纸级大片。',
+   wind:'白发在风中飞舞！剑首长发+冰刃，风中动态特效拉满。',
+   cloudy:'白发在柔和光线下质感出众，降魔阴身状态氛围感极佳。',
+   default:'白发剑首冰属性气场全开，长发自带动态特效，正片现场炸裂。'},
+  {name:'珊瑚宫心海',series:'原神 · 海祇岛巫女',img:'images/cos_rec_006.jpg',
+   hot:'蓝白宫廷风视觉清凉！水元素法器自带降温Buff，看着就凉快。',
+   rain:'雨中水巫女氛围感封顶！水珠点缀珍珠发饰，每一帧都仙气飘飘。',
+   wind:'海祇岛巫女迎风而立，蓝白裙摆随风轻扬，仙气十足。',
+   cloudy:'蓝白色系提亮阴天画面，宫廷风在柔和光线下更显精致。',
+   default:'水元素法器+蓝白宫廷风，雨天COS水巫女氛围感直接封顶。'},
+  {name:'钟离',series:'原神 · 岩王帝君',img:'images/cos_rec_007.jpg',
+   hot:'西装铠甲沉稳优雅，岩神护盾气场拉满。室内场馆空调给力！',
+   rain:'雨中帝君沉稳如山！金色岩纹在雨水中更显尊贵。',
+   wind:'岩王帝君风中岿然不动，金色披风迎风展开霸气侧漏。',
+   cloudy:'金色岩纹在柔和光线下质感出众，沉稳气质完美驾驭阴天。',
+   default:'西装铠甲沉稳优雅，岩神护盾气场拉满，帝王级正片质感。'},
+  {name:'胡桃',series:'原神 · 往生堂堂主',img:'images/cos_rec_008.jpg',
+   hot:'短装+帽子=高温天最优解！古灵精怪人设清爽出片，蝴蝶特效加倍。',
+   rain:'雨中胡桃别有韵味！帽子挡雨，小短装轻便，雨中俏皮出片。',
+   wind:'帽子压住刘海不乱飞！往生堂堂主风中依然古灵精怪。',
+   cloudy:'暗色调+红瞳在阴天自带氛围感，俏皮气质打破沉闷。',
+   default:'短装+帽子的轻便组合，古灵精怪人设随手出片，蝴蝶特效加倍。'}
+];
+
+function renderRecommendations(w){
+  var temp=w.main.temp;
+  var desc=(w.weather[0].description||'').toLowerCase();
+  var wind=w.wind.speed;
+  var recs=recBase.slice();
+
+  // Determine weather scenario
+  var scenario='default';
+  if(temp>30)scenario='hot';
+  if(desc.indexOf('雨')>=0||desc.indexOf('rain')>=0||desc.indexOf('drizzle')>=0)scenario='rain';
+  if(wind>10.8)scenario='wind'; // >5级风 (10.8m/s)
+  if(desc.indexOf('阴')>=0||desc.indexOf('云')>=0||desc.indexOf('cloud')>=0||desc.indexOf('overcast')>=0)scenario='cloudy';
+  if(temp>30&&(desc.indexOf('雨')>=0||desc.indexOf('rain')>=0))scenario='rain';
+
+  // Sort: prioritize based on weather
+  if(scenario==='hot'){
+    // Light/cool characters first: 胡桃(7), 能天使(1), 炭治郎(2)
+    var hotPriority=['胡桃','能天使','灶门炭治郎'];
+    recs.sort(function(a,b){
+      var ia=hotPriority.indexOf(a.name),ib=hotPriority.indexOf(b.name);
+      if(ia>=0&&ib>=0)return ia-ib;
+      if(ia>=0)return -1;if(ib>=0)return 1;
+      return 0;
+    });
+  }else if(scenario==='rain'){
+    var rainPriority=['珊瑚宫心海','富冈义勇','蕾电将军','镜流'];
+    recs.sort(function(a,b){
+      var ia=rainPriority.indexOf(a.name),ib=rainPriority.indexOf(b.name);
+      if(ia>=0&&ib>=0)return ia-ib;
+      if(ia>=0)return -1;if(ib>=0)return 1;
+      return 0;
+    });
+  }else if(scenario==='wind'){
+    var windPriority=['镜流','蕾电将军','富冈义勇','珊瑚宫心海'];
+    recs.sort(function(a,b){
+      var ia=windPriority.indexOf(a.name),ib=windPriority.indexOf(b.name);
+      if(ia>=0&&ib>=0)return ia-ib;
+      if(ia>=0)return -1;if(ib>=0)return 1;
+      return 0;
+    });
+  }else if(scenario==='cloudy'){
+    var cloudyPriority=['能天使','珊瑚宫心海','蕾电将军','胡桃'];
+    recs.sort(function(a,b){
+      var ia=cloudyPriority.indexOf(a.name),ib=cloudyPriority.indexOf(b.name);
+      if(ia>=0&&ib>=0)return ia-ib;
+      if(ia>=0)return -1;if(ib>=0)return 1;
+      return 0;
+    });
+  }
+
+  // Build cards
+  var tags={hot:'防暑降温',rain:'雨中出片',wind:'风中特效',cloudy:'提亮画面',default:'推荐'};
+  var tag=tags[scenario]||'推荐';
+  var html='';
+  recs.forEach(function(r){
+    var desc2=r[scenario]||r.default;
+    html+='<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url('+r.img+')"></div><span class="rec-match">'+tag+'</span></div><div class="rec-info"><h4>'+r.name+'</h4><div class="rec-series">'+r.series+'</div><div class="rec-desc">'+desc2+'</div></div></div>';
+  });
+  document.getElementById('cosRecommendList').innerHTML=html;
+}
+
+function renderDefaultRecommendations(){
+  var html='';
+  recBase.forEach(function(r){
+    html+='<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url('+r.img+')"></div><span class="rec-match">推荐</span></div><div class="rec-info"><h4>'+r.name+'</h4><div class="rec-series">'+r.series+'</div><div class="rec-desc">'+r.default+'</div></div></div>';
+  });
+  document.getElementById('cosRecommendList').innerHTML=html;
+}
+
+// ========== Init ==========
+document.addEventListener('DOMContentLoaded',function(){
+  // Init COSER page data probe
+  initCoserPage();
+});
 </script>
 </body>
 </html>
