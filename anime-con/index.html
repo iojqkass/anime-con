@@ -97,7 +97,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .weather-panel .weather-desc{font-size:15px;font-weight:600;margin:4px 0}
 .weather-panel .weather-detail{font-size:11px;color:var(--text2);display:flex;justify-content:center;gap:14px;margin-top:2px}
 .weather-panel .forecast-row{display:flex;justify-content:space-around;margin-top:10px;padding-top:10px;border-top:1px solid rgba(139,114,128,.15)}
-.forecast-day{text-align:center;font-size:11px}
+.forecast-scroll-wrap{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;margin-top:10px;padding-top:10px;border-top:1px solid rgba(139,114,128,.15);scrollbar-width:none}
+.forecast-scroll-wrap::-webkit-scrollbar{display:none}
+.forecast-scroll{display:flex;gap:10px;padding:0 2px}
+.forecast-day{text-align:center;font-size:11px;flex-shrink:0;min-width:48px}
 .forecast-day .day-name{font-weight:700;color:var(--text2)}
 .forecast-day .day-icon{font-size:22px;margin:3px 0}
 .forecast-day .day-temp{font-weight:600}
@@ -306,7 +309,7 @@ function probeImages(callback){
     c.imgs=[];
     var checked=0, found=0;
     function checkNext(i){
-      if(found>=7||checked>=7){if(--remaining===0&&callback)callback();return}
+      if(found>=5||checked>=5){if(--remaining===0&&callback)callback();return}
       var idx=i||1;
       var src='images/coser_'+c.id+'_'+idx+'.jpg';
       var img=new Image();
@@ -315,7 +318,7 @@ function probeImages(callback){
       };
       img.onerror=function(){
         checked++;
-        if(found===0&&idx<=7)checkNext(idx+1);
+        if(found===0&&idx<=5)checkNext(idx+1);
         else{if(--remaining===0&&callback)callback()}
       };
       img.src=src;
@@ -417,52 +420,123 @@ function initWeatherPage(){
   );
 }
 
+// ========== Nominatim Chinese city name ==========
+function fetchCityName(lat,lon,callback){
+  var url='https://nominatim.openstreetmap.org/reverse?lat='+lat+'&lon='+lon+'&format=json&accept-language=zh';
+  fetch(url,{headers:{'User-Agent':'AnimeCon/1.0'}}).then(function(r){return r.json()}).then(function(d){
+    var cn=d.address.city||d.address.town||d.address.county||d.address.state||'';
+    if(cn)callback(cn);else callback('');
+  }).catch(function(){callback('')});
+}
+
+// ========== 7-day forecast ==========
+function fetchForecast(lat,lon,callback){
+  var owmKey='9de243494c0b29563b1e8d1e7f3e5a7c';
+  var url='https://api.openweathermap.org/data/2.5/forecast?lat='+lat+'&lon='+lon+'&appid='+owmKey+'&units=metric&lang=zh_cn&cnt=40';
+  fetch(url).then(function(r){return r.json()}).then(function(d){
+    if(d.cod!=='200'||!d.list){callback(null);return}
+    // Group by day, extract min/max temp and dominant weather
+    var days={};
+    var dayNames=['周日','周一','周二','周三','周四','周五','周六'];
+    d.list.forEach(function(item){
+      var dt=new Date(item.dt*1000);
+      var key=dt.toISOString().slice(0,10);
+      if(!days[key])days[key]={items:[],dayName:dayNames[dt.getDay()]};
+      days[key].items.push(item);
+    });
+    var forecast=[];
+    var keys=Object.keys(days);
+    for(var i=0;i<Math.min(keys.length,7);i++){
+      var day=days[keys[i]];
+      var min=999,max=-999;
+      var icons={};
+      var desc='';
+      day.items.forEach(function(item){
+        var t=item.main.temp;
+        if(t<min)min=t;
+        if(t>max)max=t;
+        var id=item.weather[0].id;
+        icons[id]=(icons[id]||0)+1;
+        if(!desc)desc=item.weather[0].description;
+      });
+      // Find dominant icon
+      var best=0,bestId=800;
+      Object.keys(icons).forEach(function(k){if(icons[k]>best){best=icons[k];bestId=parseInt(k)}});
+      forecast.push({dayName:day.dayName,icon:getWeatherIcon(bestId,true),high:Math.round(max),low:Math.round(min),desc:desc});
+    }
+    callback(forecast);
+  }).catch(function(){callback(null)});
+}
+
+function renderForecastRow(forecast){
+  if(!forecast||forecast.length===0)return '';
+  var h='<div class="forecast-scroll-wrap"><div class="forecast-scroll">';
+  forecast.forEach(function(d){
+    h+='<div class="forecast-day"><div class="day-name">'+d.dayName+'</div><div class="day-icon">'+d.icon+'</div><div class="day-temp">'+d.high+'°/'+d.low+'°</div></div>';
+  });
+  h+='</div></div>';
+  return h;
+}
+
 function fetchWeather(lat,lon){
   var panel=document.getElementById('weatherPanel');
   var badge=document.getElementById('locBadge');
-  // Try OpenWeatherMap first
-  var owmKey='9de243494c0b29563b1e8d1e7f3e5a7c'; // free tier demo key
+  var owmKey='9de243494c0b29563b1e8d1e7f3e5a7c';
   var owmUrl='https://api.openweathermap.org/data/2.5/weather?lat='+lat+'&lon='+lon+'&appid='+owmKey+'&units=metric&lang=zh_cn';
-  fetch(owmUrl).then(function(r){return r.json()}).then(function(d){
-    if(d.cod===200){
-      badge.innerHTML='📍 '+d.name;
-      renderWeatherPanel(d,d.name,true);
-      renderRecommendations(d);
-    }else{
-      fetchWttr(lat,lon);
-    }
-  }).catch(function(){fetchWttr(lat,lon)});
+
+  // Chain: city name + weather + forecast
+  fetchCityName(lat,lon,function(cnCity){
+    fetch(owmUrl).then(function(r){return r.json()}).then(function(d){
+      if(d.cod===200){
+        var cityName=cnCity||d.name;
+        badge.innerHTML='📍 '+cityName;
+        fetchForecast(lat,lon,function(forecast){
+          renderWeatherPanel(d,cityName,true,forecast);
+          renderRecommendations(d);
+        });
+      }else{
+        fetchWttr(lat,lon);
+      }
+    }).catch(function(){fetchWttr(lat,lon)});
+  });
 }
 
 function fetchWttr(lat,lon){
-  fetch('https://wttr.in/'+lat+','+lon+'?format=j1').then(function(r){return r.json()}).then(function(d){
-    var cur=d.current_condition[0];
-    var city=d.nearest_area[0].areaName[0].value||'当前城市';
-    document.getElementById('locBadge').innerHTML='📍 '+city;
-    var w={main:{temp:parseFloat(cur.temp_C)},weather:[{description:cur.lang_zh[0].value}],wind:{speed:parseFloat(cur.windspeedKmph)/3.6},main2:{humidity:cur.humidity},name:city};
-    renderWeatherPanel(w,city,false);
-    renderRecommendations(w);
-  }).catch(function(){fallbackWeather()});
+  fetchCityName(lat,lon,function(cnCity){
+    fetch('https://wttr.in/'+lat+','+lon+'?format=j1').then(function(r){return r.json()}).then(function(d){
+      var cur=d.current_condition[0];
+      var city=cnCity||d.nearest_area[0].areaName[0].value||'当前城市';
+      document.getElementById('locBadge').innerHTML='📍 '+city;
+      // wttr.in has forecast in d.weather array
+      var forecast=null;
+      if(d.weather&&d.weather.length>0){
+        forecast=[];
+        var dayNames=['周日','周一','周二','周三','周四','周五','周六'];
+        for(var i=0;i<Math.min(d.weather.length,7);i++){
+          var wd=d.weather[i];
+          var dt=new Date(wd.date);
+          forecast.push({dayName:dayNames[dt.getDay()],icon:getWeatherIcon(800,true),high:parseInt(wd.maxtempC),low:parseInt(wd.mintempC),desc:''});
+        }
+      }
+      var w={main:{temp:parseFloat(cur.temp_C)},weather:[{description:cur.lang_zh[0].value,id:800}],wind:{speed:parseFloat(cur.windspeedKmph)/3.6},main2:{humidity:cur.humidity},name:city};
+      renderWeatherPanel(w,city,false,forecast);
+      renderRecommendations(w);
+    }).catch(function(){fallbackWeather()});
+  });
 }
 
 function fallbackWeather(){
   document.getElementById('locBadge').innerHTML='📍 上海（默认）';
   var panel=document.getElementById('weatherPanel');
+  var forecast=[{dayName:'今日',icon:'⛈',high:36,low:27},{dayName:'周三',icon:'🌧',high:35,low:27},{dayName:'周四',icon:'☁️',high:33,low:25},{dayName:'周五',icon:'☁️',high:32,low:26},{dayName:'周六',icon:'🌧',high:29,low:26},{dayName:'周日',icon:'🌧',high:30,low:27},{dayName:'周一',icon:'🌧',high:31,low:27}];
   panel.innerHTML=
     '<div class="weather-panel">'+
     '<div class="weather-city">📍 上海 · 实时天气（7月7日 出梅首日）</div>'+
     '<div class="weather-temp">36°</div>'+
     '<div class="weather-desc">多云 午后雷阵雨 ⛈</div>'+
     '<div class="weather-detail"><span>湿度 65%-90%</span><span>偏南风 4-5级</span><span>AQI 39 优</span></div>'+
-    '<div class="forecast-row">'+
-    '<div class="forecast-day"><div class="day-name">今日</div><div class="day-icon">⛈</div><div class="day-temp">36°/27°</div></div>'+
-    '<div class="forecast-day"><div class="day-name">周三</div><div class="day-icon">🌧</div><div class="day-temp">35°/27°</div></div>'+
-    '<div class="forecast-day"><div class="day-name">周四</div><div class="day-icon">☁️</div><div class="day-temp">33°/25°</div></div>'+
-    '<div class="forecast-day"><div class="day-name">周五</div><div class="day-icon">☁️</div><div class="day-temp">32°/26°</div></div>'+
-    '<div class="forecast-day"><div class="day-name">周六</div><div class="day-icon">🌧</div><div class="day-temp">29°/26°</div></div>'+
-    '<div class="forecast-day"><div class="day-name">周日</div><div class="day-icon">🌧</div><div class="day-temp">30°/27°</div></div>'+
-    '<div class="forecast-day"><div class="day-name">周一</div><div class="day-icon">🌧</div><div class="day-temp">31°/27°</div></div>'+
-    '</div></div>';
+    renderForecastRow(forecast)+
+    '</div>';
   document.getElementById('recTitle').innerHTML='<h2>⛈ 上海36℃+雷阵雨 · 推荐出展COS角色</h2>';
   renderDefaultRecommendations();
 }
@@ -475,7 +549,7 @@ function getWeatherIcon(code,isOWM){
   return '🌤';
 }
 
-function renderWeatherPanel(w,city,isOWM){
+function renderWeatherPanel(w,city,isOWM,forecast){
   var temp=Math.round(w.main.temp);
   var desc=w.weather[0].description;
   var icon=getWeatherIcon(w.weather[0].id,isOWM);
@@ -488,6 +562,7 @@ function renderWeatherPanel(w,city,isOWM){
     '<div class="weather-temp">'+temp+'°</div>'+
     '<div class="weather-desc">'+icon+' '+desc+'</div>'+
     '<div class="weather-detail"><span>温度 '+temp+'°C</span><span>风力 '+wind.toFixed(1)+' m/s</span><span>湿度 '+hum+'%</span></div>'+
+    renderForecastRow(forecast)+
     '<button class="weather-refresh" onclick="refreshWeather()" style="margin-top:10px">🔄 刷新定位</button>'+
     '</div>';
   document.getElementById('recTitle').innerHTML='<h2>'+icon+' '+city+' '+temp+'°C '+desc+' · 推荐出展COS角色</h2>';
