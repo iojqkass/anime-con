@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no,maximum-scale=1">
+<title>次元汇 — 二次元漫展资讯</title>
+<style>
+:root{--pink-50:#FFF0F5;--pink-100:#FFE0EB;--pink-200:#FFC2D9;--pink-300:#FF8CB3;--pink-400:#FF6B9D;--pink-500:#F84F87;--pink-600:#E8356E;--purple-100:#F3E8FF;--purple-200:#E8D5FF;--purple-300:#C084FC;--purple-400:#A55BF5;--purple-500:#8B3FE0;--blue-200:#BFE0FE;--blue-400:#60A5FA;--orange-200:#FED7AA;--orange-400:#FB923C;--green-300:#6EE7B7;--green-400:#34D399;--bg:#FFF5F9;--card:#fff;--text:#2D1B36;--text2:#8B7280;--text3:#B8A0B0;--border:#F0E0EB;--shadow:0 2px 12px rgba(248,79,135,0.08);--r-xs:6px;--r-sm:10px;--r-md:16px;--r-lg:24px;--font:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;height:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;overflow:hidden;height:100vh;height:100dvh;display:flex;flex-direction:column}
+.app-header{flex-shrink:0;padding:12px 5vw;display:flex;justify-content:space-between;align-items:center;background:rgba(255,245,249,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:50}
+.app-logo{display:flex;align-items:center;gap:6px}
+.app-logo .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--pink-400),var(--purple-400));border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px;box-shadow:0 2px 8px rgba(248,79,135,0.25)}
+.app-logo .logo-text{font-size:18px;font-weight:800}
+.app-logo .logo-text span{color:var(--pink-500)}
+.main-content{flex:1;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding:0 5vw calc(72px + env(safe-area-inset-bottom,16px))}
+.main-content::-webkit-scrollbar{display:none}
+.page{display:none;animation:fadeSlideIn .3s ease}
+.page.active{display:block}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.section-header{display:flex;justify-content:space-between;align-items:baseline;margin:16px 0 10px}
+.section-header h2{font-size:17px;font-weight:700}
+.section-header .see-all{font-size:12px;color:var(--pink-500);font-weight:600}
+.section-header .location-badge{font-size:11px;padding:3px 8px;border-radius:12px;background:var(--purple-200);color:var(--purple-500);font-weight:600;display:flex;align-items:center;gap:3px}
+
+/* Splash */
+.splash-hero{text-align:center;padding:20px 0 8px}
+.splash-hero .hero-emoji{font-size:48px;margin-bottom:8px;animation:bounceSoft 2s infinite}
+@keyframes bounceSoft{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.splash-hero h1{font-size:24px;font-weight:800;background:linear-gradient(135deg,var(--pink-500),var(--purple-500));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+.splash-hero .subtitle{font-size:13px;color:var(--text2)}
+.article-card{background:var(--card);border-radius:var(--r-md);padding:14px;margin-bottom:12px;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:all .15s;position:relative}
+.article-card:active{transform:scale(.98);background:var(--pink-50)}
+.article-card .source-tag{position:absolute;top:10px;right:12px;padding:2px 8px;border-radius:12px;font-size:9px;font-weight:700;background:var(--green-300);color:#065F46}
+.article-card h3{font-size:15px;font-weight:700;margin-bottom:6px;padding-right:60px;line-height:1.4}
+.article-desc{font-size:12px;color:var(--text2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:8px;line-height:1.5}
+.article-meta{font-size:11px;color:var(--text3);display:flex;gap:10px;align-items:center}
+
+/* Expo */
+.expo-item{background:var(--card);border-radius:var(--r-md);padding:14px;margin-bottom:10px;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:all .15s}
+.expo-item:active{transform:scale(.985);background:var(--pink-50)}
+.expo-date{display:inline-block;padding:3px 10px;border-radius:var(--r-xs);font-size:11px;font-weight:700;background:var(--purple-200);color:var(--purple-500);margin-bottom:8px}
+.expo-item h3{font-size:15px;font-weight:700;margin-bottom:5px}
+.expo-detail{font-size:11px;color:var(--text2);display:flex;flex-wrap:wrap;gap:4px 10px;margin-bottom:4px}
+.guest-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.guest-tag{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:var(--pink-100);color:var(--pink-600)}
+.ticket-guide{margin-top:8px;font-size:11px;color:var(--text2);background:var(--pink-50);padding:6px 10px;border-radius:var(--r-xs)}
+.ticket-guide strong{color:var(--pink-500)}
+
+/* Topic */
+.topic-card{background:var(--card);border-radius:var(--r-md);padding:14px;margin-bottom:10px;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:all .15s}
+.topic-card:active{transform:scale(.985);background:var(--pink-50)}
+.topic-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.heat-badge{display:flex;align-items:center;gap:3px;font-size:11px;font-weight:700;flex-shrink:0;margin-left:8px;white-space:nowrap}
+.heat-badge.hot{color:#F84F87}.heat-badge.rising{color:#FB923C}
+.heat-badge .dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.heat-badge .dot.hot{background:#F84F87;animation:pulse 1.5s infinite}
+.heat-badge .dot.rising{background:#FB923C;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.topic-card h3{font-size:15px;font-weight:600}
+.topic-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.topic-tag{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:var(--purple-100);color:var(--purple-500)}
+.top-comment{font-size:11px;color:var(--text2);background:var(--pink-50);padding:7px 10px;border-radius:var(--r-xs);margin-top:6px;position:relative}
+.top-comment::before{content:'';position:absolute;top:-6px;left:12px;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:6px solid var(--pink-50)}
+.top-comment .user{font-weight:700;color:var(--pink-500);margin-right:4px}
+
+/* Anime */
+.anime-card{background:var(--card);border-radius:var(--r-md);overflow:hidden;margin-bottom:10px;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:all .15s;display:flex}
+.anime-card:active{transform:scale(.985)}
+.anime-cover{width:90px;min-height:115px;flex-shrink:0;position:relative}
+.anime-cover .cover-bg{position:absolute;inset:0;background-size:cover;background-position:center}
+.anime-cover .cover-badge{position:absolute;top:4px;left:4px;padding:2px 5px;border-radius:4px;font-size:9px;font-weight:700;background:rgba(248,79,135,.88);color:#fff;z-index:1}
+.anime-info{padding:10px 12px;flex:1;min-width:0}
+.anime-info h3{font-size:14px;font-weight:700;margin-bottom:3px}
+.anime-info .anime-meta{font-size:11px;color:var(--text3);margin-bottom:4px}
+.anime-info .anime-desc{font-size:11px;color:var(--text2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5}
+.anime-info .anime-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+
+/* Coser */
+.coser-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.coser-card{background:var(--card);border-radius:var(--r-md);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow)}
+.coser-card .coser-img{width:100%;aspect-ratio:3/4;position:relative;overflow:hidden}
+.coser-card .coser-img .img-bg{position:absolute;inset:0;background-size:cover;background-position:center}
+.coser-card .coser-img .img-tag{position:absolute;bottom:6px;left:6px;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;background:rgba(45,27,54,.72);color:#fff;z-index:1}
+.coser-info{padding:8px 10px}
+.coser-info h4{font-size:13px;font-weight:700;margin-bottom:2px}
+.coser-info .coser-meta{font-size:10px;color:var(--text3)}
+
+/* Weather */
+.weather-panel{background:linear-gradient(135deg,#E8D5FF,#BFE0FE);border-radius:var(--r-lg);padding:18px;margin-bottom:14px;text-align:center}
+.weather-panel .weather-city{font-size:12px;color:var(--text2);margin-bottom:4px}
+.weather-panel .weather-temp{font-size:44px;font-weight:800;background:linear-gradient(135deg,var(--pink-500),var(--purple-500));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.weather-panel .weather-desc{font-size:15px;font-weight:600;margin:4px 0}
+.weather-panel .weather-detail{font-size:11px;color:var(--text2);display:flex;justify-content:center;gap:14px;margin-top:2px}
+.weather-panel .forecast-row{display:flex;justify-content:space-around;margin-top:10px;padding-top:10px;border-top:1px solid rgba(139,114,128,.15)}
+.forecast-day{text-align:center;font-size:11px}
+.forecast-day .day-name{font-weight:700;color:var(--text2)}
+.forecast-day .day-icon{font-size:22px;margin:3px 0}
+.forecast-day .day-temp{font-weight:600}
+.weather-alert{padding:10px 14px;background:rgba(255,107,107,.1);border-radius:var(--r-sm);margin-top:12px;font-size:11px;color:#c0392b;text-align:left;line-height:1.6;border:1px solid rgba(255,107,107,.25)}
+.weather-alert strong{display:block;margin-bottom:2px;font-size:12px}
+
+.recommend-card{background:var(--card);border-radius:var(--r-md);overflow:hidden;margin-bottom:10px;border:1px solid var(--border);box-shadow:var(--shadow);display:flex}
+.recommend-card .rec-cover{width:80px;min-height:100px;flex-shrink:0;position:relative;overflow:hidden}
+.recommend-card .rec-cover .rec-bg{position:absolute;inset:0;background-size:cover;background-position:center}
+.recommend-card .rec-cover .rec-match{position:absolute;top:4px;left:4px;padding:2px 5px;border-radius:4px;font-size:8px;font-weight:700;background:var(--green-300);color:#065F46;z-index:1}
+.rec-info{padding:8px 10px;flex:1;min-width:0}
+.rec-info h4{font-size:13px;font-weight:700;margin-bottom:2px}
+.rec-info .rec-series{font-size:10px;color:var(--pink-500);font-weight:600;margin-bottom:3px}
+.rec-info .rec-desc{font-size:10px;color:var(--text2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4}
+
+/* Tab Bar */
+.tab-bar{position:fixed;bottom:0;left:0;right:0;height:calc(64px + env(safe-area-inset-bottom,0px));padding:6px 4vw calc(6px + env(safe-area-inset-bottom,0px));background:rgba(255,255,255,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;justify-content:space-around;align-items:flex-start;z-index:100}
+.tab-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:3px 4px;cursor:pointer;transition:all .15s;min-width:44px;border-radius:var(--r-sm);-webkit-tap-highlight-color:transparent}
+.tab-item:active{background:var(--pink-100)}
+.tab-item .tab-icon{width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.tab-item .tab-label{font-size:10px;font-weight:600;color:var(--text3);white-space:nowrap}
+.tab-item.active .tab-label{color:var(--pink-500)}
+.tab-item.active .tab-icon{transform:scale(1.12)}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+<div class="app-logo"><div class="logo-icon">次</div><div class="logo-text">次元<span>汇</span></div></div>
+</div>
+
+<div class="main-content" id="mainContent">
+
+<!-- PAGE 0: Splash -->
+<div class="page active" id="page-splash">
+<div class="splash-hero"><div class="hero-emoji">🌟</div><h1>今日次元速报</h1><p class="subtitle">2026年7月7日 星期二 · 上海</p></div>
+<div class="article-card" onclick="window.open('https://new.qq.com/rain/a/20260707A027FP00','_blank')"><span class="source-tag">公众号</span><h3>上海今日出梅！BW2026倒计时3天高温预警</h3><div class="article-desc">7月7日正式出梅，今最高36℃！BW2026将于7/10-12在国家会展中心举办，130+游戏厂商蓄势待发。台风"巴威"或影响周末观展，带伞预警！</div><div class="article-meta"><span>上海发布</span><span>7/7</span><span>12万+</span></div></div>
+
+<div class="article-card" onclick="window.open('https://ttm.financial/news/2649672332','_blank')"><span class="source-tag">公众号</span><h3>库洛游戏《鸣潮》释出新区域"梦州·玄方地界"预告</h3><div class="article-desc">7月6日《鸣潮》官微连发两组新地区预告，释放全新区域视觉素材。差异化东方机关世界观持续强化，新版本蓄势待发。</div><div class="article-meta"><span>每日经济新闻</span><span>7/7</span><span>6.2万+</span></div></div>
+
+<div class="article-card" onclick="window.open('https://view.inews.qq.com/a/20260706A083TG00','_blank')"><span class="source-tag">公众号</span><h3>哔哩漫游遭B站律师函警告！GitHub仓库紧急删库</h3><div class="article-desc">热门Xposed模块"哔哩漫游"收到B站侵权告知函，要求停止数据抓取、解析、传播。该项目GitHub获星超11.4K，目前已删除全部代码。</div><div class="article-meta"><span>IT之家</span><span>7/7</span><span>8.8万+</span></div></div>
+
+<div class="article-card" onclick="window.open('https://m.sohu.com/a/1045723495_121956424','_blank')"><span class="source-tag">公众号</span><h3>7月新番黑马《少女怪兽焦糖味》豆瓣8.9持续霸榜</h3><div class="article-desc">披着特摄外衣裹着焦糖奶油的恋爱实验爆笑出圈。第一话登顶B站热搜TOP3，微博话题#即使是哥斯拉的我也会谈恋爱#单日破4.2亿。</div><div class="article-meta"><span>搜狐</span><span>7/4</span><span>15万+</span></div></div>
+
+<div class="article-card" onclick="window.open('https://new.qq.com/rain/a/20260707A01WA700','_blank')"><span class="source-tag">公众号</span><h3>B站精品中剧扩容+版号放量 港股获机构增持涨近3%</h3><div class="article-desc">B站推出《古相思曲》《青川入梦》等精品中剧，后续将上线《昭阳公主》及《长生契》。Norges Bank增持78万股，版号放量带动上涨。</div><div class="article-meta"><span>腾讯新闻</span><span>7/7</span><span>5.6万+</span></div></div>
+
+<div class="article-card" onclick="window.open('https://dzb.sunnews.cn/html/2026-07/07/content_840284.htm','_blank')"><span class="source-tag">公众号</span><h3>两岸共创AI动画短剧《活宝档案之龙脉觉醒》上线</h3><div class="article-desc">台胞江国铭联合AIGC从业者打造，用AI技术唤醒中华文物瑰宝。"三太子回大陆寻祖庙"剧情讲述两岸同根同源故事，多平台同步首播。</div><div class="article-meta"><span>海西晨报</span><span>7/7</span><span>3.2万+</span></div></div>
+
+</div>
+
+<!-- PAGE 1: Expo -->
+<div class="page" id="page-expo">
+<div class="section-header"><h2>未来3个月漫展概览</h2></div>
+
+<div class="expo-item" onclick="window.open('https://show.bilibili.com/','_blank')"><span class="expo-date">7/10-12</span><h3>BilibiliWorld 2026 · 上海</h3><div class="expo-detail"><span>国家会展中心（上海）</span><span>130+游戏厂商</span><span>痛车近千辆</span></div><div class="guest-tags"><span class="guest-tag">原神</span><span class="guest-tag">明日方舟</span><span class="guest-tag">恋与深空</span></div><div class="ticket-guide">购票指引：<strong>B站会员购</strong> show.bilibili.com</div></div>
+<div class="expo-item" onclick="window.open('https://show.bilibili.com/','_blank')"><span class="expo-date">7/11-14</span><h3>西安 · 第26届梦乡动漫展</h3><div class="expo-detail"><span>西安国际会展中心</span></div><div class="guest-tags"><span class="guest-tag">仲书悯</span><span class="guest-tag">菊花花</span><span class="guest-tag">彪桑</span></div><div class="ticket-guide">购票指引：<strong>B站会员购</strong> / <strong>喵特</strong> nyato.com</div></div>
+<div class="expo-item" onclick="window.open('https://show.bilibili.com/','_blank')"><span class="expo-date">7/16-20</span><h3>成都 · 第24届世界线动漫展</h3><div class="expo-detail"><span>中国西部国际博览城</span></div><div class="guest-tags"><span class="guest-tag">在下悟空是也</span><span class="guest-tag">姜广涛</span><span class="guest-tag">由由sama</span></div><div class="ticket-guide">购票指引：<strong>B站会员购</strong> ¥69.9起</div></div>
+<div class="expo-item" onclick="window.open('https://www.zsacg.com/','_blank')"><span class="expo-date">7/17-20</span><h3>第39届广州萤火虫动漫游戏嘉年华</h3><div class="expo-detail"><span>广州琶洲保利世贸博览馆</span><span>17周年</span></div><div class="guest-tags"><span class="guest-tag">永雏塔菲</span><span class="guest-tag">沐霂MUMU</span><span class="guest-tag">墨泽</span><span class="guest-tag">故里</span></div><div class="ticket-guide">购票指引：<strong>萤火虫官网</strong> zsacg.com / <strong>B站会员购</strong></div></div>
+<div class="expo-item" onclick="window.open('https://show.bilibili.com/','_blank')"><span class="expo-date">7/17-20</span><h3>KKWORLD快看漫乐园 · 广州</h3><div class="expo-detail"><span>保利世贸博览馆3号馆</span><span>汪东城</span></div><div class="ticket-guide">购票指引：<strong>快看漫画APP</strong> / <strong>B站会员购</strong></div></div>
+<div class="expo-item" onclick="window.open('https://show.bilibili.com/','_blank')"><span class="expo-date">7/17-19</span><h3>武汉 · 第22届梦乡动漫展</h3><div class="expo-detail"><span>武汉国际博览中心</span></div><div class="ticket-guide">购票指引：<strong>B站会员购</strong> ¥69.9起</div></div>
+<div class="expo-item" onclick="window.open('https://show.bilibili.com/','_blank')"><span class="expo-date">7/18-19</span><h3>北京 · IDO第13届动漫展</h3><div class="expo-detail"><span>北京国家会议中心</span></div><div class="ticket-guide">购票指引：<strong>B站会员购</strong></div></div>
+<div class="expo-item" onclick="window.open('https://show.bilibili.com/','_blank')"><span class="expo-date">7/19-20</span><h3>长沙 · 萌卡动漫展</h3><div class="expo-detail"><span>长沙国际会展中心</span></div><div class="ticket-guide">购票指引：<strong>B站会员购</strong> ¥68起</div></div>
+<div class="expo-item" onclick="window.open('https://show.bilibili.com/','_blank')"><span class="expo-date">7/24-27</span><h3>重庆 · 第20届梦乡动漫展</h3><div class="expo-detail"><span>重庆国际博览中心（三馆齐开）</span></div><div class="ticket-guide">购票指引：<strong>B站会员购</strong></div></div>
+<div class="expo-item" onclick="window.open('https://show.bilibili.com/','_blank')"><span class="expo-date">7/24-26</span><h3>深圳动漫节</h3><div class="expo-detail"><span>深圳福田 · 3万平</span></div><div class="ticket-guide">购票指引：<strong>B站会员购</strong> / <strong>喵特</strong> ¥78起</div></div>
+<div class="expo-item" onclick="window.open('https://show.bilibili.com/','_blank')"><span class="expo-date">7/25-26</span><h3>北京 · IJOY29漫展</h3><div class="expo-detail"><span>北京国家会议中心</span></div><div class="guest-tags"><span class="guest-tag">郑希</span><span class="guest-tag">赵乾景</span></div><div class="ticket-guide">购票指引：<strong>B站会员购</strong> / <strong>喵特</strong></div></div>
+<div class="expo-item" onclick="window.open('https://show.bilibili.com/','_blank')"><span class="expo-date">7/25-26</span><h3>西安 · 第26届ACC动漫展</h3><div class="expo-detail"><span>西安高新国际会议中心</span></div><div class="ticket-guide">购票指引：<strong>B站会员购</strong></div></div>
+<div class="expo-item" onclick="window.open('https://show.bilibili.com/','_blank')"><span class="expo-date">8/7-9</span><h3>南昌 · NJOY动漫游戏展</h3><div class="expo-detail"><span>南昌绿地国际博览中心</span></div><div class="ticket-guide">购票指引：<strong>B站会员购</strong></div></div>
+<div class="expo-item" onclick="window.open('https://show.bilibili.com/','_blank')"><span class="expo-date">8/15-16</span><h3>西安 · IW无限世界动漫游戏博览会</h3><div class="expo-detail"><span>西安国际会展中心</span></div><div class="guest-tags"><span class="guest-tag">河野华</span><span class="guest-tag">六二二</span></div><div class="ticket-guide">购票指引：<strong>B站会员购</strong></div></div>
+<div class="expo-item" onclick="window.open('https://www.zsacg.com/','_blank')"><span class="expo-date">8/22-23</span><h3>萤火虫SP · 东莞站</h3><div class="expo-detail"><span>广东现代国际展览中心</span></div><div class="ticket-guide">购票指引：<strong>萤火虫官网</strong> / <strong>B站会员购</strong></div></div>
+<div class="expo-item" onclick="window.open('https://show.bilibili.com/','_blank')"><span class="expo-date">8/22-23</span><h3>沈阳 · 第13届KG动漫游戏嘉年华</h3><div class="expo-detail"><span>沈阳商业城</span></div><div class="ticket-guide">购票指引：<strong>B站会员购</strong></div></div>
+<div class="expo-item" onclick="window.open('https://www.gegia.cn/','_blank')"><span class="expo-date">10/2-5</span><h3>CICF×AGF 广州动漫游戏盛典</h3><div class="expo-detail"><span>保利世贸博览馆</span><span>第23届金龙奖</span></div><div class="guest-tags"><span class="guest-tag">女性向专区</span><span class="guest-tag">同人区</span><span class="guest-tag">音游区</span></div><div class="ticket-guide">购票指引：<strong>CICF官网</strong> gegia.cn</div></div>
+<div class="expo-item" onclick="window.open('https://show.bilibili.com/','_blank')"><span class="expo-date">国庆期间</span><h3>上海 WF 手办模型展</h3><div class="expo-detail"><span>上海 · 全球顶级手办首发</span></div><div class="ticket-guide">购票指引：<strong>B站会员购</strong> / <strong>票星球</strong></div></div>
+</div>
+
+<!-- PAGE 2: Topics -->
+<div class="page" id="page-topic">
+<div class="section-header"><h2>热门话题</h2><span class="see-all">近2个月</span></div>
+<div class="topic-card" onclick="window.open('https://search.bilibili.com/all?keyword=BW2026+倒计时3天','_blank')"><div class="topic-header"><h3>BW2026倒计时3天！二手票价炒至3倍，官方紧急加场</h3><span class="heat-badge hot"><span class="dot hot"></span>爆 · 1.8亿</span></div><div class="topic-tags"><span class="topic-tag">BilibiliWorld</span><span class="topic-tag">抢票</span><span class="topic-tag">上海</span></div><div class="top-comment"><span class="user">@抢票难民小原</span>「17秒售罄后黄牛票炒到1500+，二开终于等到了！」</div></div>
+<div class="topic-card" onclick="window.open('https://search.bilibili.com/all?keyword=攻壳机动队+2026新版+开播','_blank')"><div class="topic-header"><h3>《攻壳机动队》2026新版今日开播！空山基设计Logo</h3><span class="heat-badge hot"><span class="dot hot"></span>热 · 8200万</span></div><div class="topic-tags"><span class="topic-tag">攻壳机动队</span><span class="topic-tag">Science SARU</span><span class="topic-tag">赛博朋克</span></div><div class="top-comment"><span class="user">@少佐的义体</span>「首度忠实改编士郎正宗原作！圆城塔编剧，全球Prime Video同步」</div></div>
+<div class="topic-card" onclick="window.open('https://search.bilibili.com/all?keyword=7月7日+新番+六部同开','_blank')"><div class="topic-header"><h3>7月7日六部新番同日开播创纪录！追番党狂喜</h3><span class="heat-badge hot"><span class="dot hot"></span>热 · 6300万</span></div><div class="topic-tags"><span class="topic-tag">七月新番</span><span class="topic-tag">攻壳机动队</span><span class="topic-tag">BLEACH</span></div><div class="top-comment"><span class="user">@追番日历小助手</span>「攻壳+与你相恋+大小姐格斗+BLEACH终章同天全来了」</div></div>
+<div class="topic-card" onclick="window.open('https://search.bilibili.com/all?keyword=鸣潮+玄方地界+新区域','_blank')"><div class="topic-header"><h3>《鸣潮》释出"梦州·玄方地界"新区域预告引热议</h3><span class="heat-badge rising"><span class="dot rising"></span>上升 · 4500万</span></div><div class="topic-tags"><span class="topic-tag">鸣潮</span><span class="topic-tag">库洛游戏</span><span class="topic-tag">开放世界</span></div><div class="top-comment"><span class="user">@漂泊者日记</span>「东方机关世界观太香了，库洛的地图设计越来越强」</div></div>
+<div class="topic-card" onclick="window.open('https://search.bilibili.com/all?keyword=少女怪兽焦糖味+豆瓣8.9','_blank')"><div class="topic-header"><h3>《少女怪兽焦糖味》豆瓣8.9 B站热搜三连冠</h3><span class="heat-badge hot"><span class="dot hot"></span>热 · 6800万</span></div><div class="topic-tags"><span class="topic-tag">七月新番</span><span class="topic-tag">恋爱喜剧</span><span class="topic-tag">黑马</span></div><div class="top-comment"><span class="user">@哥斯拉女友粉</span>「披着特摄外衣的恋爱核弹，这届怪兽比前任更会撒娇」</div></div>
+<div class="topic-card" onclick="window.open('https://search.bilibili.com/all?keyword=哔哩漫游+删库+B站律师函','_blank')"><div class="topic-header"><h3>哔哩漫游遭B站律师函！11.4K星GitHub仓库紧急删库</h3><span class="heat-badge rising"><span class="dot rising"></span>上升 · 3700万</span></div><div class="topic-tags"><span class="topic-tag">B站</span><span class="topic-tag">版权</span><span class="topic-tag">哔哩漫游</span></div><div class="top-comment"><span class="user">@开源难民</span>「11.4K Star说没就没，区域限制番剧的灰色地带到头了」</div></div>
+<div class="topic-card" onclick="window.open('https://search.bilibili.com/all?keyword=碧藍之海+第三季','_blank')"><div class="topic-header"><h3>《碧藍之海3》回归！这次去帛琉搞事</h3><span class="heat-badge rising"><span class="dot rising"></span>上升 · 3800万</span></div><div class="topic-tags"><span class="topic-tag">碧藍之海</span><span class="topic-tag">搞笑</span></div><div class="top-comment"><span class="user">@潜水社编外人员</span>「满满的乌龙茶和全裸壮汉警告wwww」</div></div>
+<div class="topic-card" onclick="window.open('https://search.bilibili.com/all?keyword=二十世纪电气目录','_blank')"><div class="topic-header"><h3>京阿尼×Netflix《二十世纪电气目录》惊艳</h3><span class="heat-badge rising"><span class="dot rising"></span>上升 · 2800万</span></div><div class="topic-tags"><span class="topic-tag">京阿尼</span><span class="topic-tag">蒸汽朋克</span></div><div class="top-comment"><span class="user">@京阿尼永远的神</span>「明治蒸汽朋克+治愈人设，原创标杆」</div></div>
+<div class="topic-card" onclick="window.open('https://search.bilibili.com/all?keyword=镖人2+动画','_blank')"><div class="topic-header"><h3>《镖人2》上线 国产武侠动画天花板</h3><span class="heat-badge rising"><span class="dot rising"></span>上升 · 2600万</span></div><div class="topic-tags"><span class="topic-tag">镖人</span><span class="topic-tag">国产动画</span><span class="topic-tag">武侠</span></div><div class="top-comment"><span class="user">@国漫之光</span>「教科书级冷兵器打斗，硬朗写实画风」</div></div>
+<div class="topic-card" onclick="window.open('https://search.bilibili.com/all?keyword=雾山五行3+暑期','_blank')"><div class="topic-header"><h3>《雾山五行3》暑期回归 国漫美学天花板</h3><span class="heat-badge rising"><span class="dot rising"></span>上升 · 2400万</span></div><div class="topic-tags"><span class="topic-tag">雾山五行</span><span class="topic-tag">水墨风</span></div><div class="top-comment"><span class="user">@水墨动画迷</span>「色彩浓烈笔触奔放，打斗视觉冲击极强」</div></div>
+<div class="topic-card" onclick="window.open('https://search.bilibili.com/all?keyword=诛仙第四季+红鸾笑','_blank')"><div class="topic-header"><h3>《诛仙第四季》最终季 红鸾笑大婚来了</h3><span class="heat-badge rising"><span class="dot rising"></span>上升 · 2200万</span></div><div class="topic-tags"><span class="topic-tag">诛仙</span><span class="topic-tag">最终季</span></div><div class="top-comment"><span class="user">@诛仙老粉</span>「红鸾笑终于来了，能不能完美还原原著！」</div></div>
+<div class="topic-card" onclick="window.open('https://search.bilibili.com/all?keyword=COSER+萤火虫+全阵容','_blank')"><div class="topic-header"><h3>COSER圈新晋顶流 萤火虫22位嘉宾集结</h3><span class="heat-badge rising"><span class="dot rising"></span>上升 · 2900万</span></div><div class="topic-tags"><span class="topic-tag">COSER</span><span class="topic-tag">墨泽</span><span class="topic-tag">故里</span></div><div class="top-comment"><span class="user">@集邮狂魔小C</span>「二十多位人气COSER全来了！相机内存已清空」</div></div>
+</div>
+
+<!-- PAGE 3: Anime -->
+<div class="page" id="page-anime">
+<div class="section-header"><h2>热番推荐</h2><span class="see-all">近3个月</span></div>
+
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=穹廬下的魔女','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_001.jpg)"></div><span class="cover-badge">NEW</span></div><div class="anime-info"><h3>穹廬下的魔女</h3><div class="anime-meta">9.8 · 历史/史诗 · Science SARU · 7/5</div><div class="anime-desc">13世纪蒙古帝国铁蹄下少女的壮阔史诗。山田尚子执导，先行上映获封强到逆天。</div><div class="anime-tags"><span class="topic-tag">史诗</span><span class="topic-tag">历史</span><span class="topic-tag">漫改神作</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=鬼灭之刃+无限城','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_002.jpeg)"></div><span class="cover-badge">HOT</span></div><div class="anime-info"><h3>鬼灭之刃 无限城篇</h3><div class="anime-meta">9.9 · 热血/战斗 · ufotable · 7/28</div><div class="anime-desc">炭治郎与鬼杀队攻入无惨老巢无限城。飞碟社巅峰作画，视觉盛宴。</div><div class="anime-tags"><span class="topic-tag">热血</span><span class="topic-tag">战斗</span><span class="topic-tag">剧场版</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=BLEACH+千年血战','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_003.jpg)"></div><span class="cover-badge">终章</span></div><div class="anime-info"><h3>BLEACH 千年血战篇-祸进谭-</h3><div class="anime-meta">9.7 · 热血/战斗 · 7/7</div><div class="anime-desc">千年血战终章灵王宫决战，护庭十三队×灭却师三方势力迎来三界存亡终局对决。</div><div class="anime-tags"><span class="topic-tag">热血</span><span class="topic-tag">最终章</span><span class="topic-tag">情怀</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=无职转生','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_004.jpg)"></div><span class="cover-badge">S3</span></div><div class="anime-info"><h3>无职转生 第三季</h3><div class="anime-meta">9.6 · 异世界/冒险 · Studio Bind · 7/5</div><div class="anime-desc">鲁迪乌斯爱丽丝修行篇+浮空岛主线，褪去少年浮躁直面人神宿命博弈。</div><div class="anime-tags"><span class="topic-tag">异世界</span><span class="topic-tag">冒险</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=碧藍之海','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_005.jpeg)"></div><span class="cover-badge">S3</span></div><div class="anime-info"><h3>GRANDBLUE碧藍之海 第三季</h3><div class="anime-meta">9.5 · 搞笑/青春 · 7月</div><div class="anime-desc">伊织与潜水社首次移师帛琉！全裸壮汉与「乌龙茶」爆笑回归。</div><div class="anime-tags"><span class="topic-tag">搞笑</span><span class="topic-tag">青春</span><span class="topic-tag">潜水</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=幼女战记','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_006.png)"></div><span class="cover-badge">S2</span></div><div class="anime-info"><h3>幼女战记 第二季</h3><div class="anime-meta">9.4 · 战争/奇幻</div><div class="anime-desc">等近十年！经济学思维打异世界魔法战争的幼女军官回归，谭雅再临战场。</div><div class="anime-tags"><span class="topic-tag">战争</span><span class="topic-tag">奇幻</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=二十世纪电气目录','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_007.jpg)"></div><span class="cover-badge">原创</span></div><div class="anime-info"><h3>二十世纪电气目录</h3><div class="anime-meta">9.3 · 蒸汽朋克/治愈 · 京阿尼</div><div class="anime-desc">明治蒸汽朋克，少年发明家推动电气文明。氛围极强，人设细腻治愈。</div><div class="anime-tags"><span class="topic-tag">京阿尼</span><span class="topic-tag">蒸汽朋克</span><span class="topic-tag">原创</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=镖人','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_008.jpg)"></div><span class="cover-badge">S2</span></div><div class="anime-info"><h3>镖人 第二季</h3><div class="anime-meta">9.5 · 武侠/历史 · 国产 · 6/11</div><div class="anime-desc">硬朗写实画风，教科书级冷兵器打斗。国产武侠动画新标杆。</div><div class="anime-tags"><span class="topic-tag">武侠</span><span class="topic-tag">国产</span><span class="topic-tag">硬核</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=雾山五行','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_009.jpg)"></div><span class="cover-badge">S3</span></div><div class="anime-info"><h3>雾山五行 第三季</h3><div class="anime-meta">9.8 · 奇幻/战斗 · 国产 · 暑期</div><div class="anime-desc">水墨风×现代动画，国漫美学天花板。色彩浓烈笔触奔放。</div><div class="anime-tags"><span class="topic-tag">水墨风</span><span class="topic-tag">国产</span><span class="topic-tag">神作</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=攻壳机动队','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_010.jpg)"></div><span class="cover-badge">新版</span></div><div class="anime-info"><h3>攻壳机动队（2026新版）</h3><div class="anime-meta">9.0 · 赛博朋克/科幻 · 7/7</div><div class="anime-desc">2029年新滨市草薙素子追查神秘黑客「傀儡师」。从士郎正宗原作重新出发。</div><div class="anime-tags"><span class="topic-tag">赛博朋克</span><span class="topic-tag">科幻</span><span class="topic-tag">经典</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=诛仙','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_011.jpg)"></div><span class="cover-badge">终章</span></div><div class="anime-info"><h3>诛仙 第四季（最终季）</h3><div class="anime-meta">9.3 · 仙侠/玄幻 · 国产 · 暑期</div><div class="anime-desc">红鸾笑大婚终于来了！张小凡终极命运揭晓，腾讯年番收官之作。</div><div class="anime-tags"><span class="topic-tag">仙侠</span><span class="topic-tag">国产</span><span class="topic-tag">最终季</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=斗破苍穹+双帝之战','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_012.jpg)"></div><span class="cover-badge">剧场</span></div><div class="anime-info"><h3>斗破苍穹剧场版：双帝之战</h3><div class="anime-meta">9.0 · 玄幻/热血 · 国产 · 7月</div><div class="anime-desc">经典IP终章剧场版，萧炎双帝之战一触即发。十余年陪伴最终落幕。</div><div class="anime-tags"><span class="topic-tag">玄幻</span><span class="topic-tag">国产</span><span class="topic-tag">剧场版</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=铁锅料理王','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_013.jpg)"></div><span class="cover-badge">NEW</span></div><div class="anime-info"><h3>铁锅料理王！（炒翻天）</h3><div class="anime-meta">8.9 · 料理/竞技 · 7/5</div><div class="anime-desc">邪道料理经典首度动画化！不择手段的中餐厨师挑战令和时代。</div><div class="anime-tags"><span class="topic-tag">料理</span><span class="topic-tag">竞技</span><span class="topic-tag">热血</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=凡人修仙传','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_014.png)"></div><span class="cover-badge">年番</span></div><div class="anime-info"><h3>凡人修仙传 年番·新篇</h3><div class="anime-meta">9.2 · 修仙/国风 · 国产</div><div class="anime-desc">国产修仙年番常青树，画质打磨与权谋长线叙事持续升级，韩立再踏征途。</div><div class="anime-tags"><span class="topic-tag">修仙</span><span class="topic-tag">国产</span><span class="topic-tag">年番</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=猫与龙','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_015.jpg)"></div><span class="cover-badge">治愈</span></div><div class="anime-info"><h3>猫与龙</h3><div class="anime-meta">9.1 · 治愈/奇幻 · 7月</div><div class="anime-desc">被猫养大的巨龙接下照顾猫族后代的责任，温暖治愈融化你的心。</div><div class="anime-tags"><span class="topic-tag">治愈</span><span class="topic-tag">奇幻</span><span class="topic-tag">萌系</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=少女怪兽焦糖味','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_016.jpg)"></div><span class="cover-badge">黑马</span></div><div class="anime-info"><h3>少女怪兽焦糖味</h3><div class="anime-meta">8.9 · 恋爱/喜剧 · 7月</div><div class="anime-desc">披着特摄外衣裹着焦糖奶油的恋爱实验。第一话登顶B站热搜TOP3。</div><div class="anime-tags"><span class="topic-tag">恋爱</span><span class="topic-tag">喜剧</span><span class="topic-tag">特摄</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=药屋','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_017.jpg)"></div><span class="cover-badge">热播</span></div><div class="anime-info"><h3>药屋少女的呢喃 第二季</h3><div class="anime-meta">9.6 · 宫廷/推理 · 续播中</div><div class="anime-desc">花街药屋试毒师猫猫在宫廷阴谋中凭借毒药知识生存。智商在线的古风推理。</div><div class="anime-tags"><span class="topic-tag">推理</span><span class="topic-tag">宫廷</span><span class="topic-tag">古风</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=铃芽之旅','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_018.jpg)"></div><span class="cover-badge">推荐</span></div><div class="anime-info"><h3>铃芽之旅 导演剪辑版</h3><div class="anime-meta">9.7 · 奇幻/冒险 · 新海诚 · 已上线</div><div class="anime-desc">追加未公开场景与重新剪辑，全国灾难巡回与自我救赎的奇幻公路之旅。</div><div class="anime-tags"><span class="topic-tag">新海诚</span><span class="topic-tag">奇幻</span><span class="topic-tag">催泪</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=咒术回战','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_019.jpg)"></div><span class="cover-badge">回归</span></div><div class="anime-info"><h3>咒术回战 第三季</h3><div class="anime-meta">9.5 · 战斗/热血 · MAPPA · 即将</div><div class="anime-desc">涩谷事变后续，咒术界迎来前所未有的变革。MAPPA倾力打造年度最燃战斗。</div><div class="anime-tags"><span class="topic-tag">战斗</span><span class="topic-tag">热血</span><span class="topic-tag">霸权</span></div></div></div>
+<div class="anime-card" onclick="window.open('https://search.bilibili.com/bangumi?keyword=龙族','_blank')"><div class="anime-cover"><div class="cover-bg" style="background-image:url(images/img_020.jpg)"></div><span class="cover-badge">国创</span></div><div class="anime-info"><h3>龙族 动画第三季</h3><div class="anime-meta">9.1 · 奇幻/冒险 · 国产 · 暑期</div><div class="anime-desc">路明非觉醒，卡塞尔学院史上最强S级新生。江南原著动画化巅峰之作。</div><div class="anime-tags"><span class="topic-tag">奇幻</span><span class="topic-tag">国产</span><span class="topic-tag">龙族</span></div></div></div>
+</div>
+
+<!-- PAGE 4: Coser -->
+<div class="page" id="page-coser">
+<div class="section-header"><h2>COSER 分享</h2><span class="see-all">近3个月</span></div>
+<div class="coser-grid">
+<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/img_001.jpg)"></div><span class="img-tag">热门</span></div><div class="coser-info"><h4>雷电将军 · 诸愿百眼之轮</h4><div class="coser-meta">墨泽 · 《原神》· 萤火虫漫展</div></div></div>
+<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/img_002.jpeg)"></div><span class="img-tag">精选</span></div><div class="coser-info"><h4>流萤 · 星核猎手</h4><div class="coser-meta">故里 · 《崩坏：星穹铁道》</div></div></div>
+<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/img_003.jpg)"></div></div><div class="coser-info"><h4>五条悟 · 无量空处</h4><div class="coser-meta">七煞 · 《咒术回战》· 成都世界线</div></div></div>
+<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/img_004.jpg)"></div><span class="img-tag">可爱</span></div><div class="coser-info"><h4>甘露寺蜜璃 · 恋之呼吸</h4><div class="coser-meta">大野茶 · 《鬼灭之刃》· 萤火虫</div></div></div>
+<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/img_005.jpeg)"></div></div><div class="coser-info"><h4>能天使 · 企鹅物流</h4><div class="coser-meta">池鱼 · 《明日方舟》· CICF</div></div></div>
+<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/img_006.png)"></div><span class="img-tag">推荐</span></div><div class="coser-info"><h4>芙莉莲 · 千年之旅</h4><div class="coser-meta">不鱼 · 《葬送的芙莉莲》</div></div></div>
+<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/img_007.jpg)"></div></div><div class="coser-info"><h4>灶门炭治郎 · 火之神乐</h4><div class="coser-meta">刀刀 · 《鬼灭之刃》· 萤火虫</div></div></div>
+<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/img_008.jpg)"></div></div><div class="coser-info"><h4>神里绫华 · 白鹭霜华</h4><div class="coser-meta">离离 · 《原神》· 梦乡漫展</div></div></div>
+<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/img_009.jpg)"></div></div><div class="coser-info"><h4>镜流 · 剑首</h4><div class="coser-meta">氧氧 · 《崩坏：星穹铁道》</div></div></div>
+<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/img_010.jpg)"></div><span class="img-tag">人气</span></div><div class="coser-info"><h4>八重神子 · 鸣神大社</h4><div class="coser-meta">沧鬼 · 《原神》· KKWorld</div></div></div>
+<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/img_011.jpg)"></div></div><div class="coser-info"><h4>胡桃 · 往生堂</h4><div class="coser-meta">三吉 · 《原神》· BW2026</div></div></div>
+<div class="coser-card"><div class="coser-img"><div class="img-bg" style="background-image:url(images/img_012.jpg)"></div></div><div class="coser-info"><h4>珊瑚宫心海 · 海祇岛</h4><div class="coser-meta">曲曲 · 《原神》· 世界线</div></div></div>
+</div></div>
+
+<!-- PAGE 5: Weather + Cos Recommend -->
+<div class="page" id="page-weather">
+<div class="section-header"><h2>推荐COS</h2><span class="location-badge">📍 上海</span></div>
+
+<!-- 上海7天天气卡片 -->
+<div class="weather-panel">
+<div class="weather-city">📍 上海 · 实时天气（7月7日 出梅首日）</div>
+<div class="weather-temp">36°</div>
+<div class="weather-desc">多云 午后雷阵雨 ⛈</div>
+<div class="weather-detail"><span>湿度 65%-90%</span><span>偏南风 4-5级</span><span>AQI 39 优</span></div>
+<div class="forecast-row">
+<div class="forecast-day"><div class="day-name">今日</div><div class="day-icon">⛈</div><div class="day-temp">36°/27°</div></div>
+<div class="forecast-day"><div class="day-name">周三</div><div class="day-icon">🌧</div><div class="day-temp">35°/27°</div></div>
+<div class="forecast-day"><div class="day-name">周四</div><div class="day-icon">☁️</div><div class="day-temp">33°/25°</div></div>
+<div class="forecast-day"><div class="day-name">周五</div><div class="day-icon">☁️</div><div class="day-temp">32°/26°</div></div>
+<div class="forecast-day"><div class="day-name">周六</div><div class="day-icon">🌧</div><div class="day-temp">29°/26°</div></div>
+<div class="forecast-day"><div class="day-name">周日</div><div class="day-icon">🌧</div><div class="day-temp">30°/27°</div></div>
+<div class="forecast-day"><div class="day-name">周一</div><div class="day-icon">🌧</div><div class="day-temp">31°/27°</div></div>
+</div>
+<div class="weather-alert">
+<strong>⚠️ 高温+台风双预警 · 上海7月7日正式出梅</strong>
+今日出梅首日最高36℃，午后局部雷阵雨。超强台风「巴威」（17级以上，中心气压915hPa）正以25-30km/h向偏西移动，预计7月10日起影响东部海域。周末多阵雨+东南大风，气温回落至29-30℃。BW2026期间（7/10-12）有风雨影响，建议携带雨具和薄外套！
+</div>
+</div>
+
+<!-- 天气推荐COS角色 -->
+<div class="section-header"><h2>⛈ 上海36℃+雷阵雨 · 推荐出展COS角色</h2></div>
+<div id="cosRecommendList">
+
+<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url(images/img_013.jpg)"></div><span class="rec-match">雷神降临</span></div><div class="rec-info"><h4>雷电将军</h4><div class="rec-series">原神 · 稻妻雷神</div><div class="rec-desc">36℃高温+午后雷阵雨？雷神COS简直是天选！紫电霸气全开，雷雨天气自带天然特效，诸愿百眼之轮配上雷电交加，出片率爆表。</div></div></div>
+
+<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url(images/img_014.png)"></div><span class="rec-match">夏日活力</span></div><div class="rec-info"><h4>能天使</h4><div class="rec-series">明日方舟 · 企鹅物流</div><div class="rec-desc">红色外套+短裤=夏天的答案！轻便不闷热，天使光环出片率炸裂。元气人设和BW2026的狂欢氛围绝配，逛展机动性满分。</div></div></div>
+
+<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url(images/img_015.jpg)"></div><span class="rec-match">热门之选</span></div><div class="rec-info"><h4>灶门炭治郎</h4><div class="rec-series">鬼灭之刃 · 水之呼吸</div><div class="rec-desc">无限城篇7/28上线Netflix！鬼杀队队服透气性好，绿色格子羽织辨识度拉满。带上日轮刀和水之呼吸，BW现场绝对被集邮到手软。</div></div></div>
+
+<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url(images/img_016.jpg)"></div><span class="rec-match">周末防雨</span></div><div class="rec-info"><h4>富冈义勇</h4><div class="rec-series">鬼灭之刃 · 水柱</div><div class="rec-desc">周末台风+阵雨来袭！水柱义勇自带水属性Buff，蓝色羽织+沉默气质在风雨中天然出片。雨水珠挂在日轮刀上，氛围感直接拉满。</div></div></div>
+
+<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url(images/img_017.jpg)"></div><span class="rec-match">台风预警</span></div><div class="rec-info"><h4>镜流</h4><div class="rec-series">崩坏：星穹铁道 · 前剑首</div><div class="rec-desc">台风「巴威」逼近！白发剑首冰属性气场全开，长发在大风中自带动态特效。降魔阴身状态+雷雨天气=史诗级正片现场。</div></div></div>
+
+<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url(images/img_018.jpg)"></div><span class="rec-match">雨中出片</span></div><div class="rec-info"><h4>珊瑚宫心海</h4><div class="rec-series">原神 · 海祇岛巫女</div><div class="rec-desc">水元素法器+蓝白宫廷风，雨天COS水巫女氛围感直接封顶！周末阵雨连连，水珠点缀珍珠发饰，每一帧都是壁纸级正片。</div></div></div>
+
+<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url(images/img_019.jpg)"></div><span class="rec-match">室内首选</span></div><div class="rec-info"><h4>钟离</h4><div class="rec-series">原神 · 岩王帝君</div><div class="rec-desc">BW2026室内场馆空调给力！西装铠甲沉稳优雅，岩神护盾气场拉满。台风天逛展首选，举手投足都是帝王级正片质感。</div></div></div>
+
+<div class="recommend-card"><div class="rec-cover"><div class="rec-bg" style="background-image:url(images/img_001.jpg)"></div><span class="rec-match">人气爆款</span></div><div class="rec-info"><h4>胡桃</h4><div class="rec-series">原神 · 往生堂堂主</div><div class="rec-desc">短装+帽子的轻便组合，36℃高温也毫无压力！古灵精怪人设随手出片，蝴蝶特效加倍。BW2026现场被集邮率Top3预定。</div></div></div>
+
+</div>
+</div>
+
+</div>
+
+<div class="tab-bar">
+<div class="tab-item active" data-page="splash" onclick="switchTab('splash',this)"><div class="tab-icon">🏠</div><span class="tab-label">今日速报</span></div>
+<div class="tab-item" data-page="expo" onclick="switchTab('expo',this)"><div class="tab-icon">📅</div><span class="tab-label">漫展概览</span></div>
+<div class="tab-item" data-page="topic" onclick="switchTab('topic',this)"><div class="tab-icon">💬</div><span class="tab-label">热门话题</span></div>
+<div class="tab-item" data-page="anime" onclick="switchTab('anime',this)"><div class="tab-icon">🎬</div><span class="tab-label">热番推荐</span></div>
+<div class="tab-item" data-page="coser" onclick="switchTab('coser',this)"><div class="tab-icon">📸</div><span class="tab-label">COSER</span></div>
+<div class="tab-item" data-page="weather" onclick="switchTab('weather',this)"><div class="tab-icon">🌤</div><span class="tab-label">推荐COS</span></div>
+</div>
+
+<script>
+function switchTab(id,el){
+  document.querySelectorAll('.tab-item').forEach(function(t){t.classList.remove('active')});
+  el.classList.add('active');
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
+  var p=document.getElementById('page-'+id);
+  if(p){p.classList.add('active');document.getElementById('mainContent').scrollTop=0}
+}
+// 懒加载图片：用 IntersectionObserver 按需加载 background-image
+(function(){
+  var observer=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        var bg=e.target.getAttribute('data-bg');
+        if(bg){e.target.style.backgroundImage='url('+bg+')';e.target.removeAttribute('data-bg')}
+        observer.unobserve(e.target)
+      }
+    })
+  },{rootMargin:'200px'});
+  document.addEventListener('DOMContentLoaded',function(){
+    document.querySelectorAll('[style*="background-image:url(images/"]').forEach(function(el){
+      var m=el.style.backgroundImage.match(/url\(([^)]+)\)/);
+      if(m){el.setAttribute('data-bg',m[1]);el.style.backgroundImage='';observer.observe(el)}
+    })
+  })
+})();
+</script>
+</body>
+</html>
