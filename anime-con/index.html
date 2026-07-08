@@ -7,6 +7,12 @@
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no,maximum-scale=1">
 <title>次元汇 — 二次元漫展资讯</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#FF6B9D">
+<link rel="apple-touch-icon" href="./icons/icon-192x192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="次元汇">
 <style>
 :root{--pink-50:#FFF0F5;--pink-100:#FFE0EB;--pink-200:#FFC2D9;--pink-300:#FF8CB3;--pink-400:#FF6B9D;--pink-500:#F84F87;--pink-600:#E8356E;--purple-100:#F3E8FF;--purple-200:#E8D5FF;--purple-300:#C084FC;--purple-400:#A55BF5;--purple-500:#8B3FE0;--blue-200:#BFE0FE;--blue-400:#60A5FA;--orange-200:#FED7AA;--orange-400:#FB923C;--green-300:#6EE7B7;--green-400:#34D399;--bg:#FFF5F9;--card:#fff;--text:#2D1B36;--text2:#8B7280;--text3:#B8A0B0;--border:#F0E0EB;--shadow:0 2px 12px rgba(248,79,135,0.08);--r-xs:6px;--r-sm:10px;--r-md:16px;--r-lg:24px;--font:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -705,6 +711,11 @@ document.addEventListener('DOMContentLoaded',function(){
   // Init COSER page data probe
   initCoserPage();
 });
+</script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(function(){});
+}
 </script>
 </body>
 </html>
