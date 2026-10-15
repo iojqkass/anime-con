@@ -610,9 +610,9 @@ function runAutotest(){
     projects.unshift(onProj); persistProjects(); saveRecords(onProj.id, []);
     out.push('on_proj:' + (onProj.enabled ? 'READY' : 'BAD'));
 
-    var pass = out[0]==='create:OK' && out[1]==='enabled_default:ON' && out[2].indexOf('url:OK')>=0 && out[3]==='copy_fn:OK' &&
-      out[4]==='toggle_off:OFF' && out[5]==='toggle_on:ON' && out[6]==='add_rec:OK' && out[7].indexOf('csv:OK')>=0 &&
-      out[8]==='dup:OK' && out[9]==='del_wrong:KEEP' && out[10]==='del_ok:DEL' && out[11]==='off_proj:READY' && out[12]==='on_proj:READY';
+    var pass = out[0]==='create:OK' && out[1]==='enabled_default:ON' && out[2].indexOf('url:OK')>=0 && out[3].indexOf('url_cfg:OK')>=0 && out[4]==='copy_fn:OK' &&
+      out[5]==='toggle_off:OFF' && out[6]==='toggle_on:ON' && out[7]==='add_rec:OK' && out[8].indexOf('csv:OK')>=0 &&
+      out[9]==='dup:OK' && out[10]==='del_wrong:KEEP' && out[11]==='del_ok:DEL' && out[12]==='off_proj:READY' && out[13]==='on_proj:READY';
     $('autotest').setAttribute('data-autotest', pass?'PASS':'FAIL');
     $('autotest').textContent = 'AUTOTEST_' + (pass?'PASS':'FAIL') + ':' + out.join('|');
   }catch(e){
