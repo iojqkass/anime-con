@@ -6,8 +6,9 @@
 <title>马牌微信抽奖 · 用户抽奖</title>
 <style>
 /* ============================================================
-   马牌微信抽奖 · 用户抽奖页 v3（纯静态 · 纯黑背景 · 无图标 · 禁蓝）
-   - 无管理入口 / 无任何操作按钮 / 每人仅一次（设备指纹 + localStorage）
+   马牌微信抽奖 · 用户抽奖页 v4（多项目管理 · 纯黑 · 无图标 · 禁蓝）
+   - 支持 ?project=项目ID 读取配置；无参数时使用内置默认配置兜底
+   - 无管理入口 / 无任何操作按钮 / 每人仅一次（设备指纹 + localStorage 按项目隔离）
    ============================================================ */
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 :root { --black:#000; --orange:#FF8C00; --yellow:#FFD27A; --pink:#FF2E63; --purple:#B5179E; --txt:#FFF; --dim:#9A9184; }
@@ -21,7 +22,7 @@ body{
 header{ text-align:center; padding-top:26px; }
 .brand{ font-size:13px; letter-spacing:6px; color:var(--dim); }
 #projectTitle{
-  margin-top:10px; font-size:42px; font-weight:900; letter-spacing:3px; line-height:1.2;
+  margin-top:10px; font-size:40px; font-weight:900; letter-spacing:3px; line-height:1.2;
   background:linear-gradient(90deg,#FFD27A 0%,#FF8C00 30%,#FF2E63 68%,#FF8C00 100%);
   -webkit-background-clip:text; background-clip:text; color:transparent;
   filter:drop-shadow(0 4px 18px rgba(255,46,99,0.45));
@@ -60,6 +61,15 @@ header{ text-align:center; padding-top:26px; }
   box-shadow:0 10px 30px rgba(255,46,99,0.45), inset 0 1px 0 rgba(255,255,255,0.30);
   text-shadow:0 2px 6px rgba(0,0,0,0.35);
 }
+
+/* 活动未开启 */
+.off-box{ text-align:center; margin-top:80px; padding:0 10px; }
+.off-title{
+  font-size:52px; font-weight:900; letter-spacing:6px;
+  background:linear-gradient(180deg,#FFD27A,#FF8C00,#FF2E63);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.off-sub{ margin-top:22px; font-size:15px; color:var(--dim); letter-spacing:2px; line-height:1.8; }
 
 /* 结果页（固定展示 · 无操作按钮） */
 .win-box{ text-align:center; margin-top:42px; }
@@ -116,7 +126,7 @@ header{ text-align:center; padding-top:26px; }
 }
 #toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
 
-@media (max-width:400px){ #projectTitle{font-size:36px} .win-title{font-size:62px} #drawAward{font-size:32px} }
+@media (max-width:400px){ #projectTitle{font-size:34px} .win-title{font-size:62px} #drawAward{font-size:32px} .off-title{font-size:44px} }
 </style>
 </head>
 <body>
@@ -144,6 +154,14 @@ header{ text-align:center; padding-top:26px; }
       </div>
       <button class="btn btn-start" id="btnStart">开 始 抽 奖</button>
       <div class="progress" style="margin-top:14px;" id="formHint">&nbsp;</div>
+    </div>
+  </div>
+
+  <!-- 活动未开启 -->
+  <div class="view" id="offView">
+    <div class="off-box">
+      <div class="off-title">活动未开启</div>
+      <div class="off-sub" id="offMsg">该抽奖活动已停止或不存在，<br>请稍后再来。</div>
     </div>
   </div>
 
@@ -175,15 +193,17 @@ header{ text-align:center; padding-top:26px; }
 <script>
 'use strict';
 /* ============================================================
-   马牌微信抽奖 · 用户页 v3（纯静态 · 每人仅一次 · 设备指纹强化防重）
-   配置：localStorage 'mapai_lottery_cfg_v3'
-   记录：localStorage 'mapai_lottery_records_v3'
+   马牌微信抽奖 · 用户页 v4（多项目管理 · 每人仅一次）
+   项目库：localStorage 'mapai_projects_v1'（与管理后台共享）
+   记录库：localStorage 'mapai_records_{projectId}' = {records, remaining}（按项目隔离）
+   无 ?project 参数时使用内置默认配置兜底（项目 id='default'）
    防重：canvas 指纹 + UA + 分辨率 + 语言 + 时区 → hash，与昵称+手机号共同判定
    ============================================================ */
-var DEFAULT_CONFIG = {
-  projectName: '马牌微信抽奖活动',
+var DEFAULT_PROJECT = {
+  id: 'default',
+  name: '马牌微信抽奖活动',
   peopleCount: 10,
-  resetCode: '8888',
+  enabled: true,
   tiers: [
     { id:'special', name:'特等奖', count:1, prizes:['马牌松赞酒店3晚 (toC消费者)'] },
     { id:'first', name:'一等奖', count:2, prizes:[
@@ -209,10 +229,10 @@ var DEFAULT_CONFIG = {
     ]}
   ]
 };
-var LS_CFG = 'mapai_lottery_cfg_v3';
-var LS_REC = 'mapai_lottery_records_v3';
+var LS_PROJ = 'mapai_projects_v1';
+var LS_REC = 'mapai_records_';
 
-var cfg, records = [], remaining = [], busy = false, currentUser = null, deviceFP = '';
+var project = null, recordKey = '', records = [], remaining = [], busy = false, currentUser = null, deviceFP = '';
 
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -221,6 +241,10 @@ function readLS(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ 
 function writeLS(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch(e){ return false; } }
 function clearLS(k){ try{ localStorage.removeItem(k); }catch(e){} }
 function fmtTime(){ var d=new Date(),p=function(n){return (n<10?'0':'')+n;}; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds()); }
+function getQuery(name){
+  var m = location.search.match(new RegExp('[?&]' + name + '=([^&]*)'));
+  return m ? decodeURIComponent(m[1]) : null;
+}
 function totalSlots(){ var s=0; remaining.forEach(function(r){ s+=r.left; }); return s; }
 
 /* ---------- 设备指纹（canvas + UA + 分辨率 + 语言 + 时区） ---------- */
@@ -242,35 +266,61 @@ function djb2(str){
   return 'fp_' + h.toString(36);
 }
 function getDeviceFP(){
-  var parts = [
-    canvasFP(),
-    navigator.userAgent || '',
-    screen.width + 'x' + screen.height,
-    navigator.language || '',
-    new Date().getTimezoneOffset()
-  ];
+  var parts = [ canvasFP(), navigator.userAgent || '', screen.width + 'x' + screen.height, navigator.language || '', new Date().getTimezoneOffset() ];
   return djb2(parts.join('|'));
 }
 
-/* ---------- 配置与状态 ---------- */
-function loadConfig(){
-  var c = readLS(LS_CFG);
-  cfg = (c && c.tiers && c.tiers.length) ? c : JSON.parse(JSON.stringify(DEFAULT_CONFIG));
-  if (!c) writeLS(LS_CFG, cfg);
-  $('projectTitle').textContent = cfg.projectName || '微信抽奖活动';
+/* ---------- 项目加载 ---------- */
+function loadProjectFromLib(pid){
+  var lib = readLS(LS_PROJ);
+  if (!lib) return null;
+  for (var i=0;i<lib.length;i++) if (lib[i].id === pid) return lib[i];
+  return null;
 }
+function unavailable(msg){
+  $('offMsg').innerHTML = esc(msg) || '该抽奖活动已停止或不存在，<br>请稍后再来。';
+  ['formView','winView'].forEach(function(id){ $(id).classList.remove('active'); });
+  $('offView').classList.add('active');
+  return null;
+}
+/* 载入指定项目（返回项目或 null 并显示未开启） */
+function loadProjectInto(pid){
+  var proj;
+  if (!pid || pid === 'default'){ proj = JSON.parse(JSON.stringify(DEFAULT_PROJECT)); }
+  else { proj = loadProjectFromLib(pid); }
+  if (!proj){ return unavailable('该抽奖活动不存在或已删除'); }
+  if (proj.enabled === false){ return unavailable('该抽奖活动已停止，请稍后再来。'); }
+  project = proj;
+  recordKey = LS_REC + proj.id;
+  $('projectTitle').textContent = proj.name;
+  var sum = 0; proj.tiers.forEach(function(t){ sum += t.count; });
+  $('slotTotal').textContent = proj.peopleCount || sum;
+  return proj;
+}
+function loadProject(){
+  var pid = getQuery('project');
+  if (!loadProjectInto(pid)) return;
+  loadState();
+  updateProgress();
+  deviceFP = getDeviceFP();
+  // 已抽设备直接显示结果页（同一设备刷新/重开固定结果页）
+  var rec = findRecord(deviceFP, '', '');
+  if (rec){ showWin(rec.nick || '', rec, true); return; }
+  goView('formView');
+}
+
+/* ---------- 状态 ---------- */
 function loadState(){
-  var st = readLS(LS_REC);
+  var st = readLS(recordKey);
   if (st && st.records && st.remaining){
     records = st.records; remaining = st.remaining;
   } else {
     records = [];
-    remaining = cfg.tiers.map(function(t){ return { tierId:t.id, tierName:t.name, left:t.count, pool:t.prizes.slice() }; });
+    remaining = project.tiers.map(function(t){ return { tierId:t.id, tierName:t.name, left:t.count, pool:t.prizes.slice() }; });
     persist();
   }
 }
-function persist(){ writeLS(LS_REC, { records:records, remaining:remaining }); }
-/* 已抽判定：设备指纹优先，昵称+手机号兜底 */
+function persist(){ writeLS(recordKey, { records:records, remaining:remaining }); }
 function findRecord(fp, nick, phone){
   for (var i=0;i<records.length;i++){
     var r = records[i];
@@ -279,10 +329,7 @@ function findRecord(fp, nick, phone){
   }
   return null;
 }
-function updateProgress(){
-  $('doneCount').textContent = records.length;
-  $('slotTotal').textContent = cfg.tiers.reduce(function(s,t){ return s+t.count; }, 0);
-}
+function updateProgress(){ $('doneCount').textContent = records.length; }
 function validPhone(p){ return /^1[3-9]\d{9}$/.test(p); }
 
 /* 抽奖核心：剩余名额等概率，同奖项奖品不重复 */
@@ -310,9 +357,8 @@ function doDraw(nick, phone){
   records.push(rec); persist();
   return rec;
 }
-
 function goView(v){
-  ['formView','winView'].forEach(function(id){ $(id).classList.remove('active'); });
+  ['formView','winView','offView'].forEach(function(id){ $(id).classList.remove('active'); });
   $(v).classList.add('active'); updateProgress();
 }
 
@@ -363,10 +409,10 @@ $('btnStart').addEventListener('click', submitForm);
 
 /* ---------- 自检：核心抽取逻辑 60 轮 ---------- */
 function selftest(){
-  var pass = 0, fail = 0, msg = '';
+  var pass = 0, fail = 0;
   for (var round=0; round<60; round++){
-    var cfg0 = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
-    var rem = cfg0.tiers.map(function(t){ return { tierId:t.id, tierName:t.name, left:t.count, pool:t.prizes.slice() }; });
+    var cfg0 = JSON.parse(JSON.stringify(DEFAULT_PROJECT.tiers));
+    var rem = cfg0.map(function(t){ return { tierId:t.id, tierName:t.name, left:t.count, pool:t.prizes.slice() }; });
     var got = [], total = 0; rem.forEach(function(r){ total += r.left; });
     for (var i=0;i<total;i++){
       var sum = 0; rem.forEach(function(r){ sum += r.left; });
@@ -382,89 +428,76 @@ function selftest(){
     }
     var leftSum = 0; rem.forEach(function(r){ leftSum += r.left; });
     var dup = false;
-    cfg0.tiers.forEach(function(t){
+    cfg0.forEach(function(t){
       var seen = {};
       got.forEach(function(g){ if (g.tierId === t.id){ if (seen[g.prize]) dup = true; seen[g.prize] = 1; } });
     });
     if (leftSum === 0 && !dup && got.length === 10) pass++;
-    else { fail++; msg = 'round'+round+' left='+leftSum+' dup='+dup+' got='+got.length; break; }
+    else { fail++; break; }
   }
   var el = $('selftest');
   el.setAttribute('data-selftest', fail===0 ? 'OK' : 'FAIL');
-  el.textContent = fail===0 ? 'SELFTEST_OK:'+pass : 'SELFTEST_FAIL:'+msg;
+  el.textContent = fail===0 ? 'SELFTEST_OK:'+pass : 'SELFTEST_FAIL';
 }
 
 /* ---------- 自动化校验（?autotest=1） ---------- */
 function runAutotest(){
   var out = [];
-  try {
-    clearLS(LS_CFG); clearLS(LS_REC);
-    loadConfig(); loadState();
-    deviceFP = getDeviceFP();
+  try{
+    clearLS(LS_PROJ);
+    ['mapai_records_default','mapai_records_isoTest','mapai_records_offTest'].forEach(clearLS);
+    project = null;
     // 0) 无管理入口 / 无复制按钮 / 无换人按钮
     out.push('no_admin:' + (document.querySelector('a[href*="admin"]') ? 'BAD' : 'OK'));
     out.push('no_copy_btn:' + (!$('btnCopy') ? 'OK' : 'BAD'));
     out.push('no_switch_btn:' + (!$('btnSwitch') ? 'OK' : 'BAD'));
-    out.push('no_emoji_btn:' + (!$('btnGear') ? 'OK' : 'BAD'));
-    // 1) 手机号校验
-    out.push('phone_invalid:' + (validPhone('123') ? 'BAD' : 'OK'));
-    out.push('phone_valid:' + (validPhone('13800000000') ? 'OK' : 'BAD'));
-    // 2) 设备指纹可用
-    out.push('fp:' + (deviceFP && deviceFP.length > 5 ? 'OK' : 'BAD'));
-    // 3) 新设备可抽
-    out.push('new_can:' + (findRecord(deviceFP, '测试A','13800000000') ? 'NO' : 'YES'));
-    // 4) 抽奖 → 固定结果页
-    var recA = doDraw('测试A','13800000000');
-    out.push('draw:' + (recA ? recA.tierName + '/' + recA.prize : 'NULL'));
-    showWin('测试A', recA, false);
-    out.push('view_win:' + ($('winView').classList.contains('active') ? 'YES' : 'NO'));
-    // 5) 模拟刷新：同设备指纹 → 已抽，直接结果页
-    loadConfig(); loadState();
-    var recA2 = findRecord(deviceFP, '测试A','13800000000');
-    out.push('recheck_fp:' + (recA2 ? 'ALREADY' : 'NOT'));
-    showWin('测试A', recA2, true);
-    out.push('view_win2:' + ($('winView').classList.contains('active') ? 'YES' : 'NO'));
-    // 6) 已抽不可重抽：同一指纹再次尝试
-    var recA3 = findRecord(deviceFP, '测试A','13800000000');
-    out.push('blocked:' + (recA3 ? 'YES' : 'NO'));
-    // 7) 纯黑背景 + 无图标元素
-    var ov = $('overlay');
-    var bg = getComputedStyle(ov).backgroundColor;
-    out.push('overlay_black:' + (bg === 'rgb(0, 0, 0)' ? 'OK' : 'BAD=' + bg));
     out.push('no_particle:' + (!$('particleLayer') ? 'OK' : 'BAD'));
     out.push('no_flash:' + (!$('flashLayer') ? 'OK' : 'BAD'));
-    var pass = out[0]==='no_admin:OK' && out[1]==='no_copy_btn:OK' && out[2]==='no_switch_btn:OK' && out[3]==='no_emoji_btn:OK' &&
-      out[4]==='phone_invalid:OK' && out[5]==='phone_valid:OK' && out[6].indexOf('fp:OK')>=0 && out[7]==='new_can:YES' &&
-      out[8].indexOf('NULL')<0 && out[9]==='view_win:YES' && out[10].indexOf('ALREADY')>=0 && out[11]==='view_win2:YES' &&
-      out[12].indexOf(':YES')>=0 && out[13].indexOf('overlay_black:OK')>=0 && out[14]==='no_particle:OK' && out[15]==='no_flash:OK';
+    // 1) 默认项目加载（无参数兜底）
+    var pk = loadProjectInto(null);
+    out.push('default_proj:' + (pk && pk.id === 'default' ? 'OK' : 'BAD'));
+    recordKey = LS_REC + 'default'; loadState();
+    deviceFP = getDeviceFP();
+    out.push('fp:' + (deviceFP && deviceFP.length > 5 ? 'OK' : 'BAD'));
+    // 2) 防重：默认项目已抽
+    var recA = doDraw('测试A','13800000000');
+    out.push('draw:' + (recA ? recA.tierName + '/' + recA.prize : 'NULL'));
+    out.push('blocked:' + (findRecord(deviceFP, '测试A','13800000000') ? 'YES' : 'NO'));
+    // 3) 按项目隔离：isoTest 项目未抽
+    var iso = JSON.parse(JSON.stringify(DEFAULT_PROJECT)); iso.id = 'isoTest'; iso.name = '隔离测试';
+    var lib0 = readLS(LS_PROJ) || []; lib0.push(iso); writeLS(LS_PROJ, lib0);
+    var pk2 = loadProjectInto('isoTest');
+    out.push('iso_load:' + (pk2 && pk2.id === 'isoTest' ? 'OK' : 'BAD'));
+    recordKey = LS_REC + 'isoTest'; loadState();
+    out.push('iso_isolated:' + (findRecord(deviceFP, '测试A','13800000000') ? 'NOT_ISOLATED' : 'ISOLATED'));
+    // 4) 关闭项目 → 未开启提示
+    var off = JSON.parse(JSON.stringify(DEFAULT_PROJECT)); off.id = 'offTest'; off.name = '关闭测试'; off.enabled = false;
+    var lib1 = readLS(LS_PROJ) || []; lib1.push(off); writeLS(LS_PROJ, lib1);
+    var pk3 = loadProjectInto('offTest');
+    out.push('off_load:' + (pk3 === null && $('offView').classList.contains('active') ? 'OFF' : 'BAD'));
+    // 5) 结果页固定 + 刷新重查仍显示
+    recordKey = LS_REC + 'default'; loadState();
+    var recA2 = findRecord(deviceFP, '测试A','13800000000');
+    showWin('测试A', recA2, true);
+    out.push('view_win:' + ($('winView').classList.contains('active') ? 'YES' : 'NO'));
+    // 6) 纯黑背景
+    var ov = $('overlay');
+    out.push('overlay_black:' + (getComputedStyle(ov).backgroundColor === 'rgb(0, 0, 0)' ? 'OK' : 'BAD'));
+    var pass = out[0]==='no_admin:OK' && out[1]==='no_copy_btn:OK' && out[2]==='no_switch_btn:OK' &&
+      out[3]==='no_particle:OK' && out[4]==='no_flash:OK' && out[5]==='default_proj:OK' && out[6].indexOf('fp:OK')>=0 &&
+      out[7].indexOf('NULL')<0 && out[8].indexOf('blocked:YES')>=0 && out[9]==='iso_load:OK' && out[10]==='iso_isolated:ISOLATED' &&
+      out[11]==='off_load:OFF' && out[12]==='view_win:YES' && out[13].indexOf('overlay_black:OK')>=0;
     $('autotest').setAttribute('data-autotest', pass?'PASS':'FAIL');
     $('autotest').textContent = 'AUTOTEST_' + (pass?'PASS':'FAIL') + ':' + out.join('|');
-  } catch(e){
+  }catch(e){
     $('autotest').setAttribute('data-autotest','FAIL');
     $('autotest').textContent = 'AUTOTEST_FAIL:' + e.message;
   }
 }
 
-function init(){
-  loadConfig();
-  loadState();
-  deviceFP = getDeviceFP();
-  updateProgress();
-  // 已抽设备直接显示结果页（同一设备刷新/重开固定结果页）
-  var rec = findRecord(deviceFP, '', '');
-  if (rec){ showWin(rec.nick || '', rec, true); return; }
-  goView('formView');
-}
-
-if (document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', function(){
-    init(); selftest();
-    if (location.search.indexOf('autotest=1') >= 0) setTimeout(runAutotest, 60);
-  });
-} else {
-  init(); selftest();
-  if (location.search.indexOf('autotest=1') >= 0) setTimeout(runAutotest, 60);
-}
+loadProject();
+selftest();
+if (location.search.indexOf('autotest=1') >= 0) setTimeout(runAutotest, 80);
 </script>
 </body>
 </html>

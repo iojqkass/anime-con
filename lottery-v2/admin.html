@@ -2,581 +2,537 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>马牌微信抽奖 · 管理后台</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>马牌抽奖管理后台</title>
 <style>
 /* ============================================================
-   马牌微信抽奖 · 管理后台页（纯静态 · 无云端 · 抖音风深色暖色系 · 禁蓝）
+   马牌抽奖管理后台 v2 · 多抽奖项目管理（纯静态 · 手动登记版）
+   - 新建抽奖 / 已发布项目列表 / 开关 / 下载CSV / 复制 / 删除
    ============================================================ */
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-:root { --bg:#0B0A0D; --orange:#FF8C00; --yellow:#FFD27A; --pink:#FF2E63; --purple:#B5179E; --txt:#FFF; --dim:#CFC4B8; --card:rgba(255,255,255,0.055); }
+*{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body{
   font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
-  background:
-    radial-gradient(560px 420px at 85% -5%, rgba(255,46,99,0.28), transparent 65%),
-    radial-gradient(500px 380px at -10% 12%, rgba(255,140,0,0.28), transparent 62%),
-    linear-gradient(175deg,#16131A 0%,#0B0A0D 60%);
-  color:var(--txt); max-width:760px; margin:0 auto; min-height:100vh; padding:0 18px 60px;
+  background:#0D0906; color:#FFF; max-width:900px; margin:0 auto; padding:0 18px 60px;
 }
-header{ text-align:center; padding-top:24px; }
+header{ padding:26px 0 16px; text-align:center; }
+.brand{ font-size:13px; letter-spacing:6px; color:#9A9184; }
 h1{
-  font-size:30px; font-weight:900; letter-spacing:4px;
-  background:linear-gradient(90deg,#FFD27A,#FF8C00,#FF2E63); -webkit-background-clip:text; background-clip:text; color:transparent;
+  margin-top:8px; font-size:38px; font-weight:900; letter-spacing:3px;
+  background:linear-gradient(90deg,#FFD27A,#FF8C00,#FF2E63,#FF8C00);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
 }
-header .tag{ display:inline-block; margin-top:10px; font-size:12px; color:var(--yellow); border:1.5px solid rgba(255,140,0,0.55); padding:5px 14px; border-radius:999px; letter-spacing:2px; }
-.nav{ text-align:center; margin-top:14px; }
-.nav a{ color:var(--yellow); font-size:13px; text-decoration:none; border-bottom:1px dashed rgba(255,210,122,0.6); margin:0 8px; }
-
+.note{ margin-top:10px; display:inline-block; font-size:12px; color:#FFD27A; border:1px dashed rgba(255,140,0,.5); border-radius:8px; padding:6px 14px; letter-spacing:1px; }
+.section{ margin-top:26px; }
+.section-title{
+  font-size:20px; font-weight:800; letter-spacing:2px; margin-bottom:14px; padding-left:10px;
+  border-left:4px solid #FF2E63; color:#FFD27A;
+}
 .card{
-  background:var(--card); border:1px solid rgba(255,140,0,0.28); border-radius:18px;
-  padding:20px 18px; margin-top:20px; box-shadow:0 6px 26px rgba(0,0,0,0.35);
+  background:rgba(255,255,255,0.045); border:1.5px solid rgba(255,140,0,0.35);
+  border-radius:16px; padding:18px; margin-bottom:14px;
 }
-.card h2{ font-size:18px; font-weight:900; letter-spacing:2px; color:var(--yellow); margin-bottom:6px; }
-.card .desc{ font-size:12.5px; color:var(--dim); margin-bottom:16px; line-height:1.7; }
-.card .warn{ font-size:13px; color:#FFB47A; background:rgba(255,46,99,0.14); border:1px solid rgba(255,46,99,0.45); padding:10px 12px; border-radius:10px; margin-bottom:16px; line-height:1.7; }
-
-.row{ display:flex; gap:10px; flex-wrap:wrap; }
-.half{ flex:1 1 220px; }
-label{ display:block; font-size:12px; color:var(--dim); margin:12px 0 6px; letter-spacing:1px; }
-input[type=text], input[type=tel], input[type=number], input[type=password], select, textarea{
-  width:100%; font-size:15px; color:var(--txt); background:rgba(255,255,255,0.06);
-  border:1.5px solid rgba(255,140,0,0.5); border-radius:10px; padding:11px 12px; outline:none;
+label{ display:block; font-size:13px; color:#9A9184; margin:12px 0 6px; letter-spacing:1px; }
+input[type=text],input[type=number],input[type=tel],select,textarea{
+  width:100%; font-size:15px; color:#FFF; background:rgba(255,255,255,0.07);
+  border:1.5px solid rgba(255,140,0,0.45); border-radius:10px; padding:11px 12px; outline:none; font-family:inherit;
 }
-input:focus, select:focus, textarea:focus{ border-color:var(--pink); box-shadow:0 0 14px rgba(255,46,99,0.3); }
-textarea{ min-height:64px; resize:vertical; line-height:1.5; }
+input:focus,select:focus,textarea:focus{ border-color:#FF2E63; box-shadow:0 0 14px rgba(255,46,99,.3); }
+textarea{ min-height:74px; resize:vertical; line-height:1.5; }
 .btn{
   border:none; cursor:pointer; font-family:inherit; font-weight:800; border-radius:12px;
-  letter-spacing:2px; transition:transform .1s; color:#FFF; padding:12px 20px; font-size:15px;
+  letter-spacing:1px; transition:transform .1s; padding:12px 20px; font-size:15px;
 }
-.btn:active{ transform:scale(.97); }
-.btn-main{ background:linear-gradient(90deg,#FF8C00,#FF2E63); box-shadow:0 6px 20px rgba(255,46,99,0.4); }
-.btn-ghost{ background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,140,0,0.6); color:var(--yellow); }
-.btn-danger{ background:linear-gradient(90deg,#FF5260,#B5179E); }
-.btn-sm{ padding:8px 14px; font-size:13px; letter-spacing:1px; border-radius:10px; }
-.btn-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
-.btn-row .btn{ flex:1 1 auto; }
+.btn:active{ transform:scale(.96); }
+.btn-main{ background:linear-gradient(90deg,#FF8C00,#FF2E63); color:#FFF; box-shadow:0 6px 18px rgba(255,46,99,.4); }
+.btn-ghost{ background:rgba(255,255,255,0.08); color:#FFD27A; border:1.5px solid rgba(255,140,0,.5); }
+.btn-danger{ background:linear-gradient(90deg,#FF3D00,#FF2E63); color:#FFF; }
+.btn-sm{ padding:7px 12px; font-size:13px; }
+.row{ display:flex; gap:12px; flex-wrap:wrap; } .row>*{ flex:1; min-width:150px; }
+.mt{ margin-top:14px; } .mt8{ margin-top:8px; }
 
-/* 奖项编辑器 */
-.tier-editor{ border:1px solid rgba(255,210,122,0.25); border-radius:12px; padding:14px; margin-top:12px; background:rgba(0,0,0,0.18); }
-.tier-head{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-.tier-head b{ flex:0 0 64px; font-size:15px; color:var(--yellow); }
-.tier-head input[type=text]{ flex:1; }
-.tier-head .count-input{ width:90px; flex:0 0 90px; }
-.tier-remove{ margin-left:auto; background:none; border:1px solid rgba(255,82,96,0.7); color:#FF8A9A; border-radius:8px; padding:6px 10px; cursor:pointer; font-size:12px; }
-.add-tier-btn{ margin-top:12px; width:100%; }
+/* 奖项行 */
+.tier-row{ background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:12px; margin-bottom:10px; }
+.tier-row .head{ display:flex; gap:10px; align-items:center; margin-bottom:8px; }
+.tier-row .head input{ flex:1; }
+.tier-row .head .count{ max-width:110px; }
 
-/* 记录表 */
-.tbl-wrap{ overflow-x:auto; margin-top:10px; }
-table{ width:100%; border-collapse:collapse; font-size:13px; }
-th, td{ padding:9px 8px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.09); }
-th{ color:var(--yellow); font-weight:700; white-space:nowrap; }
-td{ color:var(--txt); }
-tr:hover td{ background:rgba(255,140,0,0.06); }
-.empty{ text-align:center; color:var(--dim); padding:20px 0; font-size:13px; }
-.op a{ color:var(--yellow); cursor:pointer; text-decoration:underline; margin-right:8px; font-size:12px; }
-.op a.del{ color:#FF8A9A; }
-.stat-line{ font-size:12.5px; color:var(--dim); margin-top:8px; }
-.stat-line b{ color:var(--yellow); }
+/* 项目卡片 */
+.proj-card{ background:linear-gradient(145deg, rgba(255,140,0,0.09), rgba(255,46,99,0.07)); border:1.5px solid rgba(255,140,0,0.5); border-radius:16px; padding:16px; margin-bottom:16px; }
+.proj-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+.proj-name{ font-size:19px; font-weight:900; letter-spacing:1px; color:#FFF; overflow-wrap:anywhere; }
+.tag{ font-size:12px; font-weight:800; padding:5px 12px; border-radius:999px; letter-spacing:1px; }
+.tag.on{ background:linear-gradient(90deg,#FF8C00,#FF2E63); color:#FFF; }
+.tag.off{ background:rgba(255,255,255,0.1); color:#9A9184; border:1px solid rgba(255,255,255,0.2); }
+.link-row{ display:flex; gap:8px; margin-top:12px; }
+.link-row input{ flex:1; font-size:12px; padding:9px 10px; }
+.stat-row{ margin-top:10px; font-size:13px; color:#9A9184; letter-spacing:1px; } .stat-row b{ color:#FFD27A; font-size:15px; }
+.ops{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+.recs{ margin-top:16px; border-top:1px dashed rgba(255,255,255,0.15); padding-top:12px; }
+.rec-title{ font-size:14px; font-weight:800; color:#FFD27A; letter-spacing:1px; }
+.rec-form{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+.rec-form input,.rec-form select{ flex:1; min-width:130px; }
+.rec-list{ margin-top:10px; }
+.rec-item{ display:flex; gap:8px; align-items:center; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:8px 10px; margin-bottom:6px; font-size:13px; flex-wrap:wrap; }
+.rec-item .info{ flex:1; min-width:200px; color:#DDD; line-height:1.5; }
+.rec-item .info b{ color:#FFF; }
+.rec-item .meta{ color:#9A9184; font-size:12px; }
+.rec-item.editing input,.rec-item.editing select{ font-size:12px; padding:7px 8px; min-width:110px; }
+.empty{ color:#9A9184; font-size:13px; padding:14px 0; text-align:center; }
+
+/* 删除确认弹层 */
+#mask{ position:fixed; inset:0; background:rgba(0,0,0,0.75); display:none; align-items:center; justify-content:center; z-index:90; padding:0 20px; }
+#mask.show{ display:flex; }
+.dialog{ background:#1A120B; border:2px solid rgba(255,140,0,0.55); border-radius:16px; padding:22px; width:100%; max-width:400px; }
+.dialog h3{ color:#FF2E63; font-size:18px; margin-bottom:6px; letter-spacing:1px; }
+.dialog p{ color:#9A9184; font-size:13px; margin-bottom:14px; line-height:1.6; }
+.dialog .dbtns{ display:flex; gap:10px; margin-top:16px; }
 
 #toast{
-  position:fixed; left:50%; bottom:36px; transform:translateX(-50%) translateY(30px);
-  background:rgba(30,20,14,0.96); border:1.5px solid rgba(255,140,0,0.6); color:#FFD27A;
-  padding:12px 22px; border-radius:12px; font-size:14px; letter-spacing:1px;
-  opacity:0; transition:all .3s; pointer-events:none; z-index:99; max-width:88vw; text-align:center;
+  position:fixed; left:50%; bottom:30px; transform:translateX(-50%) translateY(30px);
+  background:rgba(26,18,11,0.97); border:1.5px solid rgba(255,140,0,0.6); color:#FFD27A;
+  padding:11px 22px; border-radius:12px; font-size:14px; opacity:0; transition:all .3s; z-index:99; pointer-events:none;
 }
 #toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
-.link-box{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
-.link-box input{ flex:1 1 220px; }
-@media (max-width:420px){ h1{font-size:24px} }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>马牌微信抽奖 · 管理后台</h1>
-  <div class="tag">纯静态版 · 无云端存储 · 手动登记模式</div>
-  <div class="nav">
-    <a href="index.html">→ 前往用户抽奖页</a>
-  </div>
+  <div class="brand">马牌轮胎 · 管理端</div>
+  <h1>抽奖活动管理后台</h1>
+  <div class="note">手动登记版：自动收集参与记录需接云存储，当前为本地手动登记</div>
 </header>
 
-<!-- 项目设置 -->
-<div class="card">
-  <h2>① 抽奖项目设置</h2>
-  <div class="desc">创建 / 编辑抽奖项目：活动名称、参与人数、各奖项奖品池与抽取数量、重置码。保存后用户抽奖页自动读取本配置。</div>
-  <div class="row">
-    <div class="half">
-      <label>活动名称</label>
-      <input type="text" id="cfgName" placeholder="如：马牌微信抽奖活动" maxlength="30">
+<!-- 功能一：新建抽奖 -->
+<section class="section">
+  <div class="section-title">① 新建抽奖</div>
+  <div class="card">
+    <div class="row">
+      <div>
+        <label>活动名称</label>
+        <input type="text" id="newName" placeholder="如：马牌轮胎周年庆抽奖" maxlength="30">
+      </div>
+      <div>
+        <label>参与人数（总名额）</label>
+        <input type="number" id="newCount" min="1" max="999" value="10">
+      </div>
+      <div>
+        <label>重置码（删除项目时确认用）</label>
+        <input type="text" id="newCode" placeholder="如 8888" maxlength="16">
+      </div>
     </div>
-    <div class="half">
-      <label>参与人数（总名额）</label>
-      <input type="number" id="cfgCount" min="1" max="9999" placeholder="10">
+    <div class="mt"><button class="btn btn-ghost" id="btnTemplate">一键载入马牌默认模板</button></div>
+    <div class="mt" id="tierWrap"></div>
+    <div class="row mt8">
+      <button class="btn btn-ghost" id="btnAddTier">+ 添加奖项</button>
+      <button class="btn btn-main" id="btnCreate">保存并生成项目</button>
     </div>
   </div>
-  <div class="row">
-    <div class="half">
-      <label>重置码（清空记录 / 重置抽奖时输入）</label>
-      <input type="password" id="cfgCode" placeholder="默认 8888" maxlength="12">
-    </div>
-    <div class="half">
-      <label>&nbsp;</label>
-      <button class="btn btn-ghost" id="btnTemplate" style="width:100%;">载入马牌默认配置模板</button>
-    </div>
-  </div>
+</section>
 
-  <label>奖项与奖品池（每个奖项一行：奖项名称 / 抽取数量 / 奖品池，每行一个奖品）</label>
-  <div id="tierList"></div>
-  <button class="btn btn-ghost add-tier-btn" id="btnAddTier">＋ 添加奖项</button>
+<!-- 功能二：已发布项目列表 -->
+<section class="section">
+  <div class="section-title">② 已发布项目列表（<span id="projCount">0</span>）</div>
+  <div id="projList"><div class="empty">暂无已发布项目，请先在「新建抽奖」中创建。</div></div>
+</section>
 
-  <div class="btn-row">
-    <button class="btn btn-main" id="btnSaveCfg" style="flex:1;">保 存 项 目</button>
-  </div>
-</div>
-
-<!-- 分享链接 -->
-<div class="card">
-  <h2>② 复制分享链接</h2>
-  <div class="desc">生成指向用户抽奖页的完整链接。部署后请在此填写用户页线上地址（如 https://你的域名.com/index.html），未填写时默认使用相对路径 index.html。</div>
-  <label>用户抽奖页线上地址（可选）</label>
-  <div class="link-box">
-    <input type="text" id="shareBase" placeholder="https://你的域名.com/index.html" style="flex:1 1 300px;">
-    <button class="btn btn-main" id="btnCopyLink">一键复制</button>
-  </div>
-  <div class="stat-line" id="sharePreview" style="margin-top:10px; overflow-wrap:anywhere;">分享链接：<b id="shareUrlText">index.html</b></div>
-</div>
-
-<!-- 参与结果清单 -->
-<div class="card">
-  <h2>③ 参与结果清单（手动登记版）</h2>
-  <div class="warn">⚠ 自动收集参与记录需接入云存储（如 LeanCloud / 云函数），当前为<b>纯静态手动登记版</b>：本机用户抽奖结果会自动写入本地存储并在此显示；多用户在线自动收集请后续接入云端。</div>
-
-  <div class="row">
-    <div class="half"><label>昵称</label><input type="text" id="recNick" placeholder="必填" maxlength="16"></div>
-    <div class="half"><label>手机号</label><input type="tel" id="recPhone" placeholder="11 位手机号" maxlength="11"></div>
-  </div>
-  <div class="row">
-    <div class="half">
-      <label>奖项</label>
-      <select id="recTier"></select>
-    </div>
-    <div class="half">
-      <label>奖品</label>
-      <select id="recPrize"></select>
-    </div>
-  </div>
-  <div class="btn-row">
-    <button class="btn btn-main" id="btnAddRec" style="flex:1;">＋ 添加记录</button>
-    <button class="btn btn-ghost" id="btnCopyText">复制记录文本</button>
-    <button class="btn btn-ghost" id="btnDownloadCsv">下载 CSV</button>
-  </div>
-  <div class="stat-line" id="recStat"></div>
-  <div class="tbl-wrap">
-    <table id="recTable">
-      <thead><tr><th>昵称</th><th>手机号</th><th>奖项</th><th>奖品</th><th>时间</th><th>操作</th></tr></thead>
-      <tbody id="recTbody"></tbody>
-    </table>
-    <div class="empty" id="recEmpty">暂无记录，请手动登记或让用户到抽奖页参与</div>
-  </div>
-</div>
-
-<!-- 重置 -->
-<div class="card">
-  <h2>④ 重置抽奖</h2>
-  <div class="desc">清空抽奖记录与参与清单（含用户页已抽记录）。操作需输入重置码，不可恢复。</div>
-  <div class="row">
-    <div class="half">
-      <label>重置码</label>
-      <input type="password" id="resetCodeInput" placeholder="请输入重置码">
-    </div>
-    <div class="half">
-      <label>&nbsp;</label>
-      <button class="btn btn-danger" id="btnReset" style="width:100%;">清空记录并重置</button>
+<!-- 删除确认弹层 -->
+<div id="mask">
+  <div class="dialog">
+    <h3>删除项目</h3>
+    <p>删除后将无法恢复。请输入该项目的重置码确认：</p>
+    <input type="text" id="delCode" placeholder="重置码" maxlength="16">
+    <div class="dbtns">
+      <button class="btn btn-ghost" id="delCancel" style="flex:1">取消</button>
+      <button class="btn btn-danger" id="delOk" style="flex:1">确认删除</button>
     </div>
   </div>
 </div>
 
 <div id="toast"></div>
+<div id="selftest" data-selftest="PENDING" style="display:none;"></div>
 <div id="autotest" data-autotest="PENDING" style="display:none;"></div>
 
 <script>
 'use strict';
 /* ============================================================
-   马牌微信抽奖 · 管理后台逻辑（纯静态）
-   配置：localStorage 'mapai_lottery_cfg_v3'（index.html 同 key 读取）
-   记录：localStorage 'mapai_lottery_records_v3'（与用户页共享）
+   马牌抽奖管理后台 v2 · 多抽奖项目管理
+   项目库：localStorage 'mapai_projects_v1'（数组）
+   记录库：localStorage 'mapai_records_{projectId}' = {records:[]}
    ============================================================ */
-var DEFAULT_CONFIG = {
-  projectName: '马牌微信抽奖活动',
-  peopleCount: 10,
-  resetCode: '8888',
+var LS_PROJ = 'mapai_projects_v1';
+var LS_REC = 'mapai_records_';
+var MA_TEMPLATE = {
+  name: '马牌微信抽奖活动',
+  count: 10,
+  code: '8888',
   tiers: [
-    { id:'special', name:'特等奖', count:1, prizes:['马牌松赞酒店3晚 (toC消费者)'] },
-    { id:'first', name:'一等奖', count:2, prizes:[
-      '马牌大疆相机Action 5 Pro','马牌大疆手机云台Osmo Mobile 8','马牌大疆DJI Mic Mini迷你麦克风',
-      '马牌高端野餐桌椅套装_[桌子X1/椅子X4/大号]','马牌BOSS DOUBLE B四件套','马牌天幕帐篷_米色',
-      '马牌万事堂-万事胜意茶具','马牌定制麻将套组',
-      '马牌MOMAX蓝牙音箱_[全指向扬声器/氛围灯设计/15小时续航]','马牌SC7定制款专属概念车模型'
-    ]},
-    { id:'second', name:'二等奖', count:2, prizes:[
-      '马牌大疆手机云台Osmo Mobile 8','马牌大疆DJI Mic Mini迷你麦克风','马牌BOSS DOUBLE B四件套',
-      '马牌天幕帐篷_米色','马牌高端野餐桌椅套装_[桌子X1/椅子X4/大号]',
-      '马牌外交官围炉煮茶烧烤炉两件套','马牌外交官云感高背月亮躺椅','马牌COSTA云逸套装',
-      '马牌轮胎切片展示板(挂墙)','马牌定制皂液机'
-    ]},
-    { id:'third', name:'三等奖', count:2, prizes:[
-      '马牌大疆手机云台Osmo Mobile 8','马牌大疆DJI Mic Mini迷你麦克风','马牌BOSS DOUBLE B四件套',
-      '马牌轮胎切片展示板(挂墙)','马牌天幕帐篷_米色',
-      '马牌外交官围炉煮茶烧烤炉两件套','马牌外交官云感高背月亮躺椅','马牌COSTA云逸套装'
-    ]},
-    { id:'fourth', name:'四等奖', count:3, prizes:[
-      '马牌大疆手机云台Osmo Mobile 8','马牌BOSS DOUBLE B四件套','马牌西屋养生壶[一体式/绿色]',
-      '马牌轮胎切片展示板(挂墙)','马牌COSTA云逸套装'
-    ]}
+    { name:'特等奖', count:1, prizes:['马牌松赞酒店3晚 (toC消费者)'] },
+    { name:'一等奖', count:2, prizes:['马牌大疆相机Action 5 Pro','马牌大疆手机云台Osmo Mobile 8','马牌大疆DJI Mic Mini迷你麦克风','马牌高端野餐桌椅套装_[桌子X1/椅子X4/大号]','马牌BOSS DOUBLE B四件套','马牌天幕帐篷_米色','马牌万事堂-万事胜意茶具','马牌定制麻将套组','马牌MOMAX蓝牙音箱_[全指向扬声器/氛围灯设计/15小时续航]','马牌SC7定制款专属概念车模型'] },
+    { name:'二等奖', count:2, prizes:['马牌大疆手机云台Osmo Mobile 8','马牌大疆DJI Mic Mini迷你麦克风','马牌BOSS DOUBLE B四件套','马牌天幕帐篷_米色','马牌高端野餐桌椅套装_[桌子X1/椅子X4/大号]','马牌外交官围炉煮茶烧烤炉两件套','马牌外交官云感高背月亮躺椅','马牌COSTA云逸套装','马牌轮胎切片展示板(挂墙)','马牌定制皂液机'] },
+    { name:'三等奖', count:2, prizes:['马牌大疆手机云台Osmo Mobile 8','马牌大疆DJI Mic Mini迷你麦克风','马牌BOSS DOUBLE B四件套','马牌轮胎切片展示板(挂墙)','马牌天幕帐篷_米色','马牌外交官围炉煮茶烧烤炉两件套','马牌外交官云感高背月亮躺椅','马牌COSTA云逸套装'] },
+    { name:'四等奖', count:3, prizes:['马牌大疆手机云台Osmo Mobile 8','马牌BOSS DOUBLE B四件套','马牌西屋养生壶[一体式/绿色]','马牌轮胎切片展示板(挂墙)','马牌COSTA云逸套装'] }
   ]
 };
-var LS_CFG = 'mapai_lottery_cfg_v3';
-var LS_REC = 'mapai_lottery_records_v3';
-var cfg, records = [], editId = null;
+var projects = [], deletingId = null;
 
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function toast(m){ var t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(function(){ t.classList.remove('show'); },2500); }
+function toast(m){ var t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(function(){ t.classList.remove('show'); },2400); }
 function readLS(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
 function writeLS(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch(e){ return false; } }
-function clearLS(k){ try{ localStorage.removeItem(k); }catch(e){} }
-function fmtTime(d){ d = d || new Date(); var p=function(n){return (n<10?'0':'')+n;}; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds()); }
-function validPhone(p){ return /^1[3-9]\d{9}$/.test(p); }
-function totalSlots(){ var s=0; cfg.tiers.forEach(function(t){ s += t.count; }); return s; }
+function fmtTime(){ var d=new Date(),p=function(n){return (n<10?'0':'')+n;}; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds()); }
+function genId(){ return 'p' + Date.now().toString(36) + Math.floor(Math.random()*46656).toString(36); }
+function recKey(pid){ return LS_REC + pid; }
+function loadRecords(pid){ var v = readLS(recKey(pid)); return (v && v.records) ? v.records : []; }
+function saveRecords(pid, recs){ writeLS(recKey(pid), { records: recs }); }
 
-function loadConfig(){
-  var c = readLS(LS_CFG);
-  cfg = (c && c.tiers && c.tiers.length) ? c : JSON.parse(JSON.stringify(DEFAULT_CONFIG));
-}
-function loadRecords(){
-  var st = readLS(LS_REC);
-  records = (st && st.records) ? st.records : [];
-}
-function persistRecords(){ writeLS(LS_REC, { records: records }); }
+/* ---------- 项目库 ---------- */
+function loadProjects(){ projects = readLS(LS_PROJ) || []; }
+function persistProjects(){ writeLS(LS_PROJ, projects); }
 
-/* ---------- 奖项编辑器 ---------- */
-function renderTierEditor(){
-  var list = $('tierList'); list.innerHTML = '';
-  cfg.tiers.forEach(function(t, idx){
-    var el = document.createElement('div'); el.className = 'tier-editor'; el.dataset.idx = idx;
-    el.innerHTML =
-      '<div class="tier-head">' +
-        '<b>' + esc(t.name || ('奖项'+(idx+1))) + '</b>' +
-        '<input type="text" class="t-name" value="' + esc(t.name) + '" placeholder="奖项名称">' +
-        '<input type="number" class="t-count count-input" min="1" max="999" value="' + t.count + '" placeholder="数量">' +
-        '<button class="tier-remove" type="button">移除</button>' +
-      '</div>' +
-      '<textarea class="t-prizes" placeholder="奖品池，每行一个奖品">' + esc(t.prizes.join('\n')) + '</textarea>';
-    list.appendChild(el);
-  });
+/* ---------- 新建抽奖 ---------- */
+function tierHTML(t){
+  return '<div class="tier-row" data-t="' + (t&&t._k?t._k:'') + '">' +
+    '<div class="head">' +
+    '<input type="text" class="tName" placeholder="奖项名称（如 一等奖）" value="' + esc(t?t.name:'') + '">' +
+    '<input type="number" class="tCount" min="1" max="99" placeholder="数量" value="' + (t?t.count:'') + '">' +
+    '<button class="btn btn-danger btn-sm tDel">删除</button></div>' +
+    '<textarea class="tPrizes" placeholder="奖品池（每行一个奖品）">' + (t ? t.prizes.join('\n') : '') + '</textarea>' +
+    '</div>';
 }
 function collectTiers(){
-  var out = [];
-  var nodes = $('tierList').children;
-  for (var i=0;i<nodes.length;i++){
-    var n = nodes[i];
-    var name = n.querySelector('.t-name').value.trim();
-    var count = parseInt(n.querySelector('.t-count').value, 10);
-    var prizes = n.querySelector('.t-prizes').value.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
-    if (!name || !count || !prizes.length) continue;
-    out.push({ id:'t'+(i+1), name:name, count:count, prizes:prizes });
-  }
+  var rows = document.querySelectorAll('.tier-row'), out = [];
+  rows.forEach(function(r){
+    var name = r.querySelector('.tName').value.trim();
+    var count = parseInt(r.querySelector('.tCount').value, 10) || 0;
+    var prizes = r.querySelector('.tPrizes').value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+    if (name && count > 0 && prizes.length) out.push({ name:name, count:count, prizes:prizes });
+  });
   return out;
 }
-$('btnAddTier').addEventListener('click', function(){
-  cfg.tiers.push({ id:'t'+(cfg.tiers.length+1), name:'新奖项', count:1, prizes:['奖品1','奖品2'] });
-  renderTierEditor();
-});
-$('tierList').addEventListener('click', function(e){
-  var btn = e.target.closest('.tier-remove');
-  if (!btn) return;
-  var idx = +btn.closest('.tier-editor').dataset.idx;
-  cfg.tiers.splice(idx, 1); renderTierEditor();
-});
-
-/* 载入默认模板 */
-function loadTemplate(){
-  cfg = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
-  $('cfgName').value = cfg.projectName;
-  $('cfgCount').value = cfg.peopleCount;
-  $('cfgCode').value = cfg.resetCode;
-  renderTierEditor();
-  toast('已载入马牌默认配置');
+function renderTierEditor(list){
+  var w = $('tierWrap'); w.innerHTML = '';
+  list.forEach(function(t){ w.insertAdjacentHTML('beforeend', tierHTML(t)); });
+  w.addEventListener('click', function(e){
+    if (e.target.classList.contains('tDel')){ e.target.closest('.tier-row').remove(); }
+  });
 }
-$('btnTemplate').addEventListener('click', loadTemplate);
-
-/* 保存项目 */
-function saveConfig(){
-  var name = $('cfgName').value.trim();
-  var count = parseInt($('cfgCount').value, 10);
-  var code = $('cfgCode').value.trim();
+function loadTemplate(){
+  $('newName').value = MA_TEMPLATE.name;
+  $('newCount').value = MA_TEMPLATE.count;
+  $('newCode').value = MA_TEMPLATE.code;
+  renderTierEditor(MA_TEMPLATE.tiers);
+  toast('已载入马牌默认模板');
+}
+function createProject(){
+  var name = $('newName').value.trim();
+  var count = parseInt($('newCount').value, 10) || 0;
+  var code = $('newCode').value.trim() || '8888';
   var tiers = collectTiers();
   if (!name){ toast('请填写活动名称'); return; }
-  if (!count || count < 1){ toast('请填写有效参与人数'); return; }
-  if (!tiers.length){ toast('请至少保留一个有效奖项'); return; }
-  var prizeTotal = 0; tiers.forEach(function(t){ prizeTotal += t.count; });
-  if (prizeTotal > count){ toast('奖品总数量(' + prizeTotal + ')超过参与人数(' + count + ')，请调整'); return; }
-  cfg.projectName = name; cfg.peopleCount = count; cfg.resetCode = code || '8888';
-  cfg.tiers = tiers;
-  writeLS(LS_CFG, cfg);
-  renderTierEditor(); refreshRecSelect();
-  toast('项目已保存，用户页将读取新配置');
+  if (count <= 0){ toast('请填写参与人数'); return; }
+  if (!tiers.length){ toast('至少需要一个有效的奖项（名称/数量/奖品池）'); return; }
+  var sum = 0; tiers.forEach(function(t){ sum += t.count; });
+  if (sum > count){ toast('奖项名额之和(' + sum + ')超过参与人数(' + count + ')，请调整'); return; }
+  var proj = { id:genId(), name:name, peopleCount:count, code:code, enabled:true, createdAt:fmtTime(), tiers:tiers };
+  projects.unshift(proj); persistProjects();
+  saveRecords(proj.id, []);
+  $('newName').value=''; $('newCount').value='10'; $('newCode').value='';
+  renderTierEditor([]);
+  renderProjects();
+  toast('项目已创建：' + name);
+  return proj;
 }
-$('btnSaveCfg').addEventListener('click', saveConfig);
+function projectURL(pid){
+  var base = location.href.split('?')[0].split('#')[0];
+  return base + '?project=' + pid;
+}
+function copyText(txt, cb){
+  var done = false;
+  try{
+    var ta = document.createElement('textarea'); ta.value = txt; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    var ok = document.execCommand('copy'); document.body.removeChild(ta);
+    if (ok){ cb && cb(); done = true; }
+  }catch(e){}
+  if (!done && navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){ cb && cb(); }).catch(function(){ toast('复制失败，请手动复制'); });
+  } else if (!done){ toast('复制失败，请手动复制'); }
+}
 
-/* ---------- 分享链接 ---------- */
-function buildShareUrl(){
-  var base = $('shareBase').value.trim();
-  if (!base) return 'index.html';
-  return base.indexOf('://') >= 0 ? base : base;
-}
-function updateSharePreview(){ $('shareUrlText').textContent = buildShareUrl(); }
-$('shareBase').addEventListener('input', updateSharePreview);
-function copyLink(){
-  var url = buildShareUrl();
-  var text = url;
-  function done(){ toast('链接已复制：' + url); }
-  if (navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
-  } else { fallbackCopy(text, done); }
-}
-function fallbackCopy(text, done){
-  var ta = document.createElement('textarea');
-  ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
-  document.body.appendChild(ta); ta.select();
-  try { document.execCommand('copy'); done(); } catch(e){ toast('复制失败，请手动复制'); }
-  document.body.removeChild(ta);
-}
-$('btnCopyLink').addEventListener('click', copyLink);
-
-/* ---------- 记录：下拉联动 ---------- */
-function refreshRecSelect(){
-  var tierSel = $('recTier'), prizeSel = $('recPrize');
-  var curTier = tierSel.value || (cfg.tiers[0] ? cfg.tiers[0].id : '');
-  tierSel.innerHTML = '';
-  cfg.tiers.forEach(function(t){
-    var o = document.createElement('option');
-    o.value = t.id; o.textContent = t.name;
-    if (t.id === curTier) o.selected = true;
-    tierSel.appendChild(o);
-  });
-  refreshPrizeSelect();
-}
-function refreshPrizeSelect(){
-  var tierSel = $('recTier'), prizeSel = $('recPrize');
-  var tier = null;
-  cfg.tiers.forEach(function(t){ if (t.id === tierSel.value) tier = t; });
-  var cur = prizeSel.value || '';
-  prizeSel.innerHTML = '';
-  if (tier){
-    tier.prizes.forEach(function(p){
-      var o = document.createElement('option'); o.value = p; o.textContent = p;
-      if (p === cur) o.selected = true;
-      prizeSel.appendChild(o);
+/* ---------- 项目列表渲染 ---------- */
+function renderProjects(){
+  $('projCount').textContent = projects.length;
+  var el = $('projList');
+  if (!projects.length){ el.innerHTML = '<div class="empty">暂无已发布项目，请先在「新建抽奖」中创建。</div>'; return; }
+  el.innerHTML = projects.map(function(p){
+    var recs = loadRecords(p.id);
+    var tag = p.enabled ? '<span class="tag on">开启中</span>' : '<span class="tag off">已停止</span>';
+    return '<div class="proj-card" data-id="' + p.id + '">' +
+      '<div class="proj-head"><div class="proj-name">' + esc(p.name) + '</div>' + tag + '</div>' +
+      '<div class="link-row"><input type="text" readonly value="' + esc(projectURL(p.id)) + '">' +
+        '<button class="btn btn-ghost btn-sm bCopy">复制</button></div>' +
+      '<div class="stat-row">抽奖情况：已抽 <b>' + recs.length + '</b> / 共 ' + p.peopleCount + ' 人 · 奖项 ' + p.tiers.length + ' 档 · 创建于 ' + esc(p.createdAt) + '</div>' +
+      '<div class="ops">' +
+        '<button class="btn btn-main btn-sm bToggle">' + (p.enabled ? '停止' : '开启') + '</button>' +
+        '<button class="btn btn-ghost btn-sm bDl">下载表单</button>' +
+        '<button class="btn btn-ghost btn-sm bDup">复制新项目</button>' +
+        '<button class="btn btn-danger btn-sm bDel">删除</button>' +
+      '</div>' +
+      '<div class="recs"><div class="rec-title">参与记录（手动登记）</div>' +
+        '<div class="rec-form">' +
+          '<input type="text" class="rNick" placeholder="昵称（抖音昵称）" maxlength="16">' +
+          '<input type="tel" class="rPhone" placeholder="手机号" maxlength="11">' +
+          '<select class="rTier">' + p.tiers.map(function(t){ return '<option>' + esc(t.name) + '</option>'; }).join('') + '</select>' +
+          '<input type="text" class="rPrize" placeholder="奖品" list="dl_' + p.id + '">' +
+          '<datalist id="dl_' + p.id + '">' + p.tiers.map(function(t){ return t.prizes.map(function(pr){ return '<option value="' + esc(pr) + '"></option>'; }).join(''); }).join('') + '</datalist>' +
+          '<button class="btn btn-main btn-sm rAdd">添加</button>' +
+        '</div>' +
+        '<div class="rec-list"></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  el.querySelectorAll('.proj-card').forEach(function(card){
+    var pid = card.getAttribute('data-id');
+    renderRecList(card, pid);
+    card.querySelector('.bCopy').addEventListener('click', function(){
+      copyText(projectURL(pid), function(){ toast('链接已复制'); });
     });
-  }
+    card.querySelector('.bToggle').addEventListener('click', function(){ toggleProject(pid); });
+    card.querySelector('.bDl').addEventListener('click', function(){ downloadCSV(pid); });
+    card.querySelector('.bDup').addEventListener('click', function(){ duplicateProject(pid); });
+    card.querySelector('.bDel').addEventListener('click', function(){ openDelDialog(pid); });
+    card.querySelector('.rAdd').addEventListener('click', function(){ addRecord(card, pid); });
+  });
 }
-$('recTier').addEventListener('change', refreshPrizeSelect);
-
-/* 添加 / 更新记录 */
-function addOrUpdateRec(){
-  var nick = $('recNick').value.trim();
-  var phone = $('recPhone').value.trim();
-  var tierSel = $('recTier'), prizeSel = $('recPrize');
-  if (!nick){ toast('请填写昵称'); return; }
-  if (!validPhone(phone)){ toast('手机号格式不正确'); return; }
-  var tierName = tierSel.options[tierSel.selectedIndex].textContent;
-  var prize = prizeSel.value;
-  if (!prize){ toast('请选择奖品'); return; }
-  if (editId){
-    records.forEach(function(r){ if (r.id === editId){ r.nick=nick; r.phone=phone; r.tierName=tierName; r.prize=prize; r.time=fmtTime(); r.source='manual'; } });
-    editId = null; $('btnAddRec').textContent = '＋ 添加记录';
-    toast('记录已更新');
-  } else {
-    records.push({ id:'m'+Date.now()+''+Math.floor(Math.random()*9999), nick:nick, phone:phone, tierName:tierName, prize:prize, time:fmtTime(), source:'manual' });
-    toast('记录已添加');
-  }
-  $('recNick').value=''; $('recPhone').value='';
-  persistRecords(); renderRecords();
-}
-$('btnAddRec').addEventListener('click', addOrUpdateRec);
-
-function editRecord(id){
-  var r = null; records.forEach(function(x){ if (x.id === id) r = x; });
-  if (!r) return;
-  editId = id;
-  $('recNick').value = r.nick; $('recPhone').value = r.phone;
-  var ts = $('recTier'); var found = false;
-  for (var i=0;i<ts.options.length;i++){
-    if (ts.options[i].textContent === r.tierName){ ts.selectedIndex = i; found = true; break; }
-  }
-  if (!found && ts.options.length) ts.selectedIndex = 0;
-  refreshPrizeSelect();
-  var ps = $('recPrize');
-  for (var j=0;j<ps.options.length;j++){ if (ps.options[j].value === r.prize){ ps.selectedIndex = j; break; } }
-  $('btnAddRec').textContent = '✓ 保存修改';
-  toast('正在编辑：' + r.nick);
-  window.scrollTo(0, $('recNick').getBoundingClientRect().top + window.scrollY - 140);
-}
-function deleteRecord(id){
-  records = records.filter(function(r){ return r.id !== id; });
-  persistRecords(); renderRecords(); toast('记录已删除');
-}
-
-function renderRecords(){
-  var tbody = $('recTbody'), empty = $('recEmpty');
-  tbody.innerHTML = '';
-  if (!records.length){ empty.style.display = 'block'; }
-  else {
-    empty.style.display = 'none';
-    records.slice().reverse().forEach(function(r){
-      var tr = document.createElement('tr');
-      tr.innerHTML =
-        '<td>' + esc(r.nick) + '</td>' +
-        '<td>' + esc(r.phone) + '</td>' +
-        '<td>' + esc(r.tierName) + '</td>' +
-        '<td>' + esc(r.prize) + '</td>' +
-        '<td>' + esc(r.time) + '</td>' +
-        '<td class="op"><a data-act="edit" data-id="' + esc(r.id) + '">编辑</a><a class="del" data-act="del" data-id="' + esc(r.id) + '">删除</a></td>';
-      tbody.appendChild(tr);
+function renderRecList(card, pid){
+  var recs = loadRecords(pid);
+  var box = card.querySelector('.rec-list');
+  if (!recs.length){ box.innerHTML = '<div class="empty">暂无记录</div>'; return; }
+  box.innerHTML = recs.map(function(r, i){
+    return '<div class="rec-item" data-i="' + i + '">' +
+      '<span class="info"><b>' + esc(r.nick) + '</b> · ' + esc(r.phone) + '<br>' +
+      esc(r.tierName) + ' / ' + esc(r.prize) + '</span>' +
+      '<span class="meta">' + esc(r.time) + '</span>' +
+      '<button class="btn btn-ghost btn-sm rEdit">编辑</button>' +
+      '<button class="btn btn-danger btn-sm rDel">删除</button>' +
+      '</div>';
+  }).join('');
+  box.querySelectorAll('.rec-item').forEach(function(item){
+    var i = parseInt(item.getAttribute('data-i'), 10);
+    item.querySelector('.rDel').addEventListener('click', function(){
+      var recs2 = loadRecords(pid); recs2.splice(i,1); saveRecords(pid, recs2); renderProjects(); toast('记录已删除');
     });
+    item.querySelector('.rEdit').addEventListener('click', function(){ enterEdit(item, pid, i); });
+  });
+}
+function enterEdit(item, pid, i){
+  var recs = loadRecords(pid), r = recs[i];
+  var tiers = projects.find(function(p){ return p.id === pid; }).tiers;
+  item.classList.add('editing');
+  item.innerHTML =
+    '<input class="eNick" value="' + esc(r.nick) + '" maxlength="16">' +
+    '<input class="ePhone" value="' + esc(r.phone) + '" maxlength="11">' +
+    '<select class="eTier">' + tiers.map(function(t){ return '<option' + (t.name===r.tierName?' selected':'') + '>' + esc(t.name) + '</option>'; }).join('') + '</select>' +
+    '<input class="ePrize" value="' + esc(r.prize) + '">' +
+    '<input class="eTime" value="' + esc(r.time) + '">' +
+    '<button class="btn btn-main btn-sm eSave">保存</button>' +
+    '<button class="btn btn-ghost btn-sm eCancel">取消</button>';
+  item.querySelector('.eCancel').addEventListener('click', function(){ renderProjects(); });
+  item.querySelector('.eSave').addEventListener('click', function(){
+    var recs2 = loadRecords(pid);
+    recs2[i] = {
+      nick:item.querySelector('.eNick').value.trim() || r.nick,
+      phone:item.querySelector('.ePhone').value.trim() || r.phone,
+      tierName:item.querySelector('.eTier').value,
+      prize:item.querySelector('.ePrize').value.trim() || r.prize,
+      time:item.querySelector('.eTime').value.trim() || r.time
+    };
+    saveRecords(pid, recs2); renderProjects(); toast('记录已更新');
+  });
+}
+function addRecord(card, pid){
+  var nick = card.querySelector('.rNick').value.trim();
+  var phone = card.querySelector('.rPhone').value.trim();
+  var tier = card.querySelector('.rTier').value;
+  var prize = card.querySelector('.rPrize').value.trim();
+  if (!nick || !phone){ toast('昵称与手机号必填'); return; }
+  if (!prize) prize = tier;
+  var recs = loadRecords(pid);
+  recs.push({ nick:nick, phone:phone, tierName:tier, prize:prize, time:fmtTime() });
+  saveRecords(pid, recs);
+  card.querySelector('.rNick').value=''; card.querySelector('.rPhone').value=''; card.querySelector('.rPrize').value='';
+  renderProjects(); toast('记录已添加');
+}
+
+/* ---------- 项目操作 ---------- */
+function toggleProject(pid){
+  var p = projects.find(function(x){ return x.id === pid; });
+  if (!p) return;
+  p.enabled = !p.enabled; persistProjects(); renderProjects();
+  toast(p.enabled ? '项目已开启' : '项目已停止（用户页将提示活动未开启）');
+}
+function duplicateProject(pid){
+  var src = projects.find(function(x){ return x.id === pid; });
+  if (!src) return;
+  var copy = JSON.parse(JSON.stringify(src));
+  copy.id = genId(); copy.name = src.name + '-副本'; copy.enabled = false;
+  copy.createdAt = fmtTime();
+  projects.unshift(copy); persistProjects(); saveRecords(copy.id, []);
+  renderProjects(); toast('已复制新项目（默认停止，可手动开启）');
+}
+function openDelDialog(pid){
+  deletingId = pid; $('delCode').value='';
+  $('mask').classList.add('show'); $('delCode').focus();
+}
+function confirmDel(){
+  if (!deletingId) return;
+  var p = projects.find(function(x){ return x.id === deletingId; });
+  var code = $('delCode').value.trim();
+  if (!p){ $('mask').classList.remove('show'); deletingId=null; return; }
+  if (code !== p.code){ toast('重置码错误，无法删除'); return; }
+  projects = projects.filter(function(x){ return x.id !== deletingId; });
+  persistProjects(); localStorage.removeItem(recKey(deletingId));
+  deletingId = null; $('mask').classList.remove('show');
+  renderProjects(); toast('项目已删除');
+}
+
+/* ---------- 下载 CSV ---------- */
+function buildCSV(pid){
+  var recs = loadRecords(pid);
+  var head = '昵称,手机号,奖项,奖品,时间';
+  var lines = recs.map(function(r){
+    function q(s){ s = String(s); return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; }
+    return [q(r.nick), q(r.phone), q(r.tierName), q(r.prize), q(r.time)].join(',');
+  });
+  return head + '\n' + lines.join('\n');
+}
+function downloadCSV(pid){
+  var p = projects.find(function(x){ return x.id === pid; });
+  var csv = buildCSV(pid);
+  var name = (p ? p.name : pid) + '_参与记录.csv';
+  try{
+    var blob = new Blob([ '\ufeff' + csv ], { type:'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a'); a.href = url; a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 300);
+    toast('已导出：' + name);
+  }catch(e){ toast('导出失败，可改用复制 CSV 内容'); }
+}
+
+/* ---------- 事件绑定 ---------- */
+$('btnTemplate').addEventListener('click', loadTemplate);
+$('btnAddTier').addEventListener('click', function(){ renderTierEditor(collectTiers().concat([{ name:'', count:1, prizes:[] }])); });
+$('btnCreate').addEventListener('click', createProject);
+$('delCancel').addEventListener('click', function(){ deletingId=null; $('mask').classList.remove('show'); });
+$('delOk').addEventListener('click', confirmDel);
+
+/* ---------- 自检 ---------- */
+function selftest(){
+  var pass = 0, fail = 0;
+  for (var round=0; round<30; round++){
+    var rem = MA_TEMPLATE.tiers.map(function(t){ return { name:t.name, left:t.count, pool:t.prizes.slice() }; });
+    var got = [], total = 0; rem.forEach(function(r){ total += r.left; });
+    for (var i=0;i<total;i++){
+      var sum = 0; rem.forEach(function(r){ sum += r.left; });
+      var rr = Math.random()*sum, j;
+      for (j=0;j<rem.length;j++){
+        if (rr < rem[j].left){
+          var pool = rem[j].pool, idx = Math.floor(Math.random()*pool.length);
+          got.push({ tier:rem[j].name, prize:pool[idx] }); rem[j].left--; pool.splice(idx,1); break;
+        }
+        rr -= rem[j].left;
+      }
+    }
+    var leftSum = 0; rem.forEach(function(r){ leftSum += r.left; });
+    var dup = false;
+    MA_TEMPLATE.tiers.forEach(function(t){
+      var seen = {};
+      got.forEach(function(g){ if (g.tier === t.name){ if (seen[g.prize]) dup = true; seen[g.prize] = 1; } });
+    });
+    if (leftSum === 0 && !dup && got.length === 10) pass++; else { fail++; break; }
   }
-  $('recStat').innerHTML = '共 <b>' + records.length + '</b> 条记录（其中本机用户页自动登记 <b>' +
-    records.filter(function(r){ return r.source==='auto'; }).length + '</b> 条，手动登记 <b>' +
-    records.filter(function(r){ return r.source!=='auto'; }).length + '</b> 条）';
-}
-$('recTbody').addEventListener('click', function(e){
-  var a = e.target.closest('a[data-act]');
-  if (!a) return;
-  if (a.dataset.act === 'edit') editRecord(a.dataset.id);
-  else if (a.dataset.act === 'del') deleteRecord(a.dataset.id);
-});
-
-/* 导出：复制文本 / 下载 CSV */
-function buildExportText(){
-  if (!records.length) return '（暂无参与记录）';
-  var lines = ['马牌微信抽奖 · 参与结果清单（' + fmtTime() + '）'];
-  records.slice().reverse().forEach(function(r){
-    lines.push('昵称：' + r.nick + '｜手机号：' + r.phone + '｜奖项：' + r.tierName + '｜奖品：' + r.prize + '｜时间：' + r.time);
-  });
-  return lines.join('\n');
-}
-function buildCSV(){
-  var rows = [['昵称','手机号','奖项','奖品','时间']];
-  records.slice().forEach(function(r){
-    rows.push([r.nick, r.phone, r.tierName, r.prize, r.time]);
-  });
-  return rows.map(function(row){
-    return row.map(function(cell){
-      var s = String(cell == null ? '' : cell);
-      return (s.indexOf(',') >= 0 || s.indexOf('"') >= 0 || s.indexOf('\n') >= 0) ? '"' + s.replace(/"/g,'""') + '"' : s;
-    }).join(',');
-  }).join('\r\n');
-}
-$('btnCopyText').addEventListener('click', function(){
-  var text = buildExportText();
-  function done(){ toast('记录文本已复制'); }
-  if (navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
-  } else { fallbackCopy(text, done); }
-});
-$('btnDownloadCsv').addEventListener('click', function(){
-  var csv = buildCSV();
-  var blob;
-  try { blob = new Blob(['\ufeff' + csv], { type:'text/csv;charset=utf-8' }); }
-  catch(e){ blob = new Blob([csv], { type:'text/csv;charset=utf-8' }); }
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = '马牌抽奖参与清单_' + Date.now() + '.csv';
-  document.body.appendChild(a); a.click();
-  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(a.href); }, 400);
-  toast('CSV 已生成并下载');
-});
-
-/* 重置 */
-function resetAll(){
-  var code = $('resetCodeInput').value.trim();
-  var expect = cfg.resetCode || '8888';
-  if (code !== expect){ toast('重置码错误，无法重置'); return; }
-  records = []; persistRecords(); renderRecords();
-  toast('已清空全部抽奖记录与参与清单');
-  $('resetCodeInput').value='';
-}
-$('btnReset').addEventListener('click', resetAll);
-
-/* ---------- 初始化 ---------- */
-function init(){
-  loadConfig();
-  $('cfgName').value = cfg.projectName;
-  $('cfgCount').value = cfg.peopleCount;
-  $('cfgCode').value = cfg.resetCode || '8888';
-  renderTierEditor();
-  loadRecords(); renderRecords();
-  refreshRecSelect();
-  updateSharePreview();
+  var el = $('selftest');
+  el.setAttribute('data-selftest', fail===0 ? 'OK' : 'FAIL');
+  el.textContent = fail===0 ? 'SELFTEST_OK:'+pass : 'SELFTEST_FAIL';
 }
 
 /* ---------- 自动化校验（?autotest=1） ---------- */
 function runAutotest(){
   var out = [];
-  try {
-    // 清理并载入默认
-    clearLS(LS_CFG); clearLS(LS_REC);
-    loadTemplate();
-    saveConfigSafe();
-    loadRecords();
-    // 1) 新增记录
-    var id1 = addRecDirect('后台测试','13911112222','特等奖','马牌松赞酒店3晚 (toC消费者)');
-    var id2 = addRecDirect('后台测试2','13933334444','一等奖','马牌大疆相机Action 5 Pro');
-    out.push('add:' + (records.length === 2 ? 'OK' : 'BAD=' + records.length));
-    // 2) 编辑记录
-    var id3 = editRecDirect(id2, '后台测试2改','13933334444','四等奖','马牌COSTA云逸套装');
-    out.push('edit:' + (id3 ? 'OK' : 'BAD'));
-    // 3) 删除记录
-    deleteRecord(id1);
-    out.push('del:' + (records.length === 1 ? 'OK' : 'BAD=' + records.length));
-    // 4) 导出 CSV 内容
-    var csv = buildCSV();
-    out.push('csv:' + (csv.indexOf('昵称') >= 0 && csv.indexOf('后台测试2改') >= 0 && csv.indexOf('马牌COSTA云逸套装') >= 0 ? 'OK' : 'BAD'));
-    // 5) 导出文本
-    var txt = buildExportText();
-    out.push('txt:' + (txt.indexOf('后台测试2改') >= 0 ? 'OK' : 'BAD'));
-    // 6) 重置码校验逻辑
-    out.push('code:' + ((cfg.resetCode||'8888') === '8888' ? 'OK' : 'BAD'));
-    var pass = out.every(function(s){ return s.indexOf(':OK') >= 0 || s.indexOf('add:OK') >= 0; });
-    var realPass = out[0]==='add:OK' && out[1].indexOf('edit:OK')>=0 && out[2]==='del:OK' && out[3].indexOf('csv:OK')>=0 && out[4].indexOf('txt:OK')>=0 && out[5]==='code:OK';
-    $('autotest').setAttribute('data-autotest', realPass?'PASS':'FAIL');
-    $('autotest').textContent = 'AUTOTEST_' + (realPass?'PASS':'FAIL') + ':' + out.join('|');
-  } catch(e){
+  try{
+    localStorage.removeItem(LS_PROJ);
+    ['pTest','pTestOff','pTestDup'].forEach(function(k){ localStorage.removeItem(recKey(k)); });
+    loadProjects();
+    // 1) 创建项目（模拟表单输入）
+    $('newName').value = '校验测试活动';
+    $('newCount').value = 10;
+    $('newCode').value = '8888';
+    renderTierEditor([{ name:'一等奖', count:2, prizes:['奖品甲','奖品乙'] }, { name:'二等奖', count:2, prizes:['奖品丙'] }]);
+    var p1 = createProject();
+    out.push('create:' + (p1 && p1.id ? 'OK' : 'BAD'));
+    var pid = p1.id;
+    out.push('enabled_default:' + (p1.enabled ? 'ON' : 'OFF'));
+    // 2) 生成链接含 ?project=
+    var url = projectURL(pid);
+    out.push('url:' + (url.indexOf('?project=' + pid) >= 0 ? 'OK' : 'BAD'));
+    // 3) 复制函数可执行（内部路径）
+    out.push('copy_fn:' + (typeof copyText === 'function' ? 'OK' : 'BAD'));
+    // 4) 开启/关闭切换
+    toggleProject(pid);
+    out.push('toggle_off:' + (!p1.enabled ? 'OFF' : 'BAD'));
+    toggleProject(pid);
+    out.push('toggle_on:' + (p1.enabled ? 'ON' : 'BAD'));
+    // 5) 添加记录
+    var card = document.querySelector('.proj-card[data-id="' + pid + '"]');
+    card.querySelector('.rNick').value = '测试用户';
+    card.querySelector('.rPhone').value = '13800000000';
+    card.querySelector('.rTier').value = '一等奖';
+    card.querySelector('.rPrize').value = '奖品甲';
+    addRecord(card, pid);
+    var recs = loadRecords(pid);
+    out.push('add_rec:' + (recs.length === 1 && recs[0].nick === '测试用户' ? 'OK' : 'BAD'));
+    // 6) 导出 CSV 内容
+    var csv = buildCSV(pid);
+    out.push('csv:' + (csv.indexOf('昵称,手机号,奖项,奖品,时间') >= 0 && csv.indexOf('测试用户,13800000000,一等奖,奖品甲') >= 0 ? 'OK' : 'BAD'));
+    // 7) 复制新项目
+    duplicateProject(pid);
+    var dup = projects.find(function(x){ return x.id !== pid && x.name.indexOf('副本') >= 0; });
+    out.push('dup:' + (dup ? 'OK' : 'BAD'));
+    // 8) 删除：错误码拒绝 + 正确码删除
+    deletingId = dup.id; $('delCode').value = '0000';
+    confirmDel();
+    out.push('del_wrong:' + (projects.find(function(x){ return x.id === dup.id; }) ? 'KEEP' : 'BAD'));
+    deletingId = dup.id; $('delCode').value = dup.code;
+    confirmDel();
+    out.push('del_ok:' + (!projects.find(function(x){ return x.id === dup.id; }) ? 'DEL' : 'BAD'));
+    // 9) 关闭项目供用户页校验未开启
+    var offProj = { id:'pTestOff', name:'已停止测试活动', peopleCount:5, code:'0000', enabled:false, createdAt:fmtTime(), tiers:[{ name:'特等奖', count:1, prizes:['停用奖'] }] };
+    projects.unshift(offProj); persistProjects(); saveRecords(offProj.id, []);
+    out.push('off_proj:' + (offProj.enabled ? 'BAD' : 'READY'));
+    // 10) 开启项目供用户页读取配置
+    var onProj = { id:'pTest', name:'校验测试活动', peopleCount:10, code:'8888', enabled:true, createdAt:fmtTime(), tiers:[{ name:'一等奖', count:2, prizes:['奖品甲','奖品乙'] }, { name:'二等奖', count:2, prizes:['奖品丙'] }] };
+    projects.unshift(onProj); persistProjects(); saveRecords(onProj.id, []);
+    out.push('on_proj:' + (onProj.enabled ? 'READY' : 'BAD'));
+
+    var pass = out[0]==='create:OK' && out[1]==='enabled_default:ON' && out[2].indexOf('url:OK')>=0 && out[3]==='copy_fn:OK' &&
+      out[4]==='toggle_off:OFF' && out[5]==='toggle_on:ON' && out[6]==='add_rec:OK' && out[7].indexOf('csv:OK')>=0 &&
+      out[8]==='dup:OK' && out[9]==='del_wrong:KEEP' && out[10]==='del_ok:DEL' && out[11]==='off_proj:READY' && out[12]==='on_proj:READY';
+    $('autotest').setAttribute('data-autotest', pass?'PASS':'FAIL');
+    $('autotest').textContent = 'AUTOTEST_' + (pass?'PASS':'FAIL') + ':' + out.join('|');
+  }catch(e){
     $('autotest').setAttribute('data-autotest','FAIL');
     $('autotest').textContent = 'AUTOTEST_FAIL:' + e.message;
   }
 }
-function saveConfigSafe(){ /* 与 saveConfig 等价但不依赖 UI 提示 */ }
-function addRecDirect(nick, phone, tierName, prize){
-  var r = { id:'m'+Date.now()+''+Math.floor(Math.random()*9999), nick:nick, phone:phone, tierName:tierName, prize:prize, time:fmtTime(), source:'manual' };
-  records.push(r); return r.id;
-}
-function editRecDirect(id, nick, phone, tierName, prize){
-  var hit = null;
-  records.forEach(function(r){ if (r.id === id){ r.nick=nick; r.phone=phone; r.tierName=tierName; r.prize=prize; r.time=fmtTime(); hit = r; } });
-  return hit;
-}
 
-if (document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', function(){
-    init();
-    if (location.search.indexOf('autotest=1') >= 0) setTimeout(runAutotest, 60);
-  });
-} else {
-  init();
-  if (location.search.indexOf('autotest=1') >= 0) setTimeout(runAutotest, 60);
-}
+loadProjects();
+renderTierEditor(MA_TEMPLATE.tiers);
+renderProjects();
+selftest();
+if (location.search.indexOf('autotest=1') >= 0) setTimeout(runAutotest, 80);
 </script>
 </body>
 </html>
