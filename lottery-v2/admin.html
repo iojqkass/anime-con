@@ -159,7 +159,10 @@ textarea{ min-height:74px; resize:vertical; line-height:1.5; }
    马牌抽奖管理后台 v2 · 多抽奖项目管理
    项目库：localStorage 'mapai_projects_v1'（数组）
    记录库：localStorage 'mapai_records_{projectId}' = {records:[]}
+   分享链接自带项目配置（LZString 压缩进 &cfg=），保存即上线，无需重新部署
    ============================================================ */
+/* LZString 1.5.0 (MIT) */
+var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",e={};function t(r,o){if(!e[r]){e[r]={};for(var n=0;n<r.length;n++)e[r][r.charAt(n)]=n}return e[r][o]}var i={compressToBase64:function(r){if(null==r)return"";var n=i._compress(r,6,function(r){return o.charAt(r)});switch(n.length%4){default:case 0:return n;case 1:return n+"===";case 2:return n+"==";case 3:return n+"="}},decompressFromBase64:function(r){return null==r?"":""==r?null:i._decompress(r.length,32,function(n){return t(o,r.charAt(n))})},compressToUTF16:function(o){return null==o?"":i._compress(o,15,function(o){return r(o+32)})+" "},decompressFromUTF16:function(r){return null==r?"":""==r?null:i._decompress(r.length,16384,function(o){return r.charCodeAt(o)-32})},compressToUint8Array:function(r){for(var o=i.compress(r),n=new Uint8Array(2*o.length),e=0,t=o.length;e<t;e++){var s=o.charCodeAt(e);n[2*e]=s>>>8,n[2*e+1]=s%256}return n},decompressFromUint8Array:function(o){if(null==o)return i.decompress(o);for(var n=new Array(o.length/2),e=0,t=n.length;e<t;e++)n[e]=256*o[2*e]+o[2*e+1];var s=[];return n.forEach(function(o){s.push(r(o))}),i.decompress(s.join(""))},compressToEncodedURIComponent:function(r){return null==r?"":i._compress(r,6,function(r){return n.charAt(r)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:(r=r.replace(/ /g,"+"),i._decompress(r.length,32,function(o){return t(n,r.charAt(o))}))},compress:function(o){return i._compress(o,16,function(o){return r(o)})},_compress:function(r,o,n){if(null==r)return"";var e,t,i,s={},u={},a="",p="",c="",l=2,f=3,h=2,d=[],m=0,v=0;for(i=0;i<r.length;i+=1)if(a=r.charAt(i),Object.prototype.hasOwnProperty.call(s,a)||(s[a]=f++,u[a]=!0),p=c+a,Object.prototype.hasOwnProperty.call(s,p))c=p;else{if(Object.prototype.hasOwnProperty.call(u,c)){if(c.charCodeAt(0)<256){for(e=0;e<h;e++)m<<=1,v==o-1?(v=0,d.push(n(m)),m=0):v++;for(t=c.charCodeAt(0),e=0;e<8;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;e<h;e++)m=m<<1|t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=c.charCodeAt(0),e=0;e<16;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}0==--l&&(l=Math.pow(2,h),h++),delete u[c]}else for(t=s[c],e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;0==--l&&(l=Math.pow(2,h),h++),s[p]=f++,c=String(a)}if(""!==c){if(Object.prototype.hasOwnProperty.call(u,c)){if(c.charCodeAt(0)<256){for(e=0;e<h;e++)m<<=1,v==o-1?(v=0,d.push(n(m)),m=0):v++;for(t=c.charCodeAt(0),e=0;e<8;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;e<h;e++)m=m<<1|t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=c.charCodeAt(0),e=0;e<16;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}0==--l&&(l=Math.pow(2,h),h++),delete u[c]}else for(t=s[c],e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;0==--l&&(l=Math.pow(2,h),h++)}for(t=2,e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;for(;;){if(m<<=1,v==o-1){d.push(n(m));break}v++}return d.join("")},decompress:function(r){return null==r?"":""==r?null:i._decompress(r.length,32768,function(o){return r.charCodeAt(o)})},_decompress:function(o,n,e){var t,i,s,u,a,p,c,l=[],f=4,h=4,d=3,m="",v=[],g={val:e(0),position:n,index:1};for(t=0;t<3;t+=1)l[t]=t;for(s=0,a=Math.pow(2,2),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;switch(s){case 0:for(s=0,a=Math.pow(2,8),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;c=r(s);break;case 1:for(s=0,a=Math.pow(2,16),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;c=r(s);break;case 2:return""}for(l[3]=c,i=c,v.push(c);;){if(g.index>o)return"";for(s=0,a=Math.pow(2,d),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;switch(c=s){case 0:for(s=0,a=Math.pow(2,8),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;l[h++]=r(s),c=h-1,f--;break;case 1:for(s=0,a=Math.pow(2,16),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;l[h++]=r(s),c=h-1,f--;break;case 2:return v.join("")}if(0==f&&(f=Math.pow(2,d),d++),l[c])m=l[c];else{if(c!==h)return null;m=i+i.charAt(0)}v.push(m),l[h++]=i+m.charAt(0),i=m,0==--f&&(f=Math.pow(2,d),d++)}}};return i}();"function"==typeof define&&define.amd?define(function(){return LZString}):"undefined"!=typeof module&&null!=module?module.exports=LZString:"undefined"!=typeof angular&&null!=angular&&angular.module("LZString",[]).factory("LZString",function(){return LZString});
 var LS_PROJ = 'mapai_projects_v1';
 var LS_REC = 'mapai_records_';
 var MA_TEMPLATE = {
@@ -244,11 +247,17 @@ function createProject(){
   toast('项目已创建：' + name);
   return proj;
 }
-function projectURL(pid){
+function findProject(pid){
+  for (var i=0;i<projects.length;i++) if (projects[i].id === pid) return projects[i];
+  return null;
+}
+function projectURL(p){
   var base = location.href.split('?')[0].split('#')[0];
   // 后台页复制出的链接必须指向用户抽奖页(index.html)，而非后台管理页(admin.html)
   base = base.replace(/(^|\/)admin\.html$/i, '$1index.html');
-  return base + '?project=' + pid;
+  // 项目配置压缩进链接，用户端打开即自动上线，无需重新部署
+  var cfg = LZString.compressToEncodedURIComponent(JSON.stringify(p));
+  return base + '?project=' + p.id + '&cfg=' + cfg;
 }
 function copyText(txt, cb){
   var done = false;
@@ -273,7 +282,7 @@ function renderProjects(){
     var tag = p.enabled ? '<span class="tag on">开启中</span>' : '<span class="tag off">已停止</span>';
     return '<div class="proj-card" data-id="' + p.id + '">' +
       '<div class="proj-head"><div class="proj-name">' + esc(p.name) + '</div>' + tag + '</div>' +
-      '<div class="link-row"><input type="text" readonly value="' + esc(projectURL(p.id)) + '">' +
+      '<div class="link-row"><input type="text" readonly value="' + esc(projectURL(p)) + '">' +
         '<button class="btn btn-ghost btn-sm bCopy">复制</button></div>' +
       '<div class="stat-row">抽奖情况：已抽 <b>' + recs.length + '</b> / 共 ' + p.peopleCount + ' 人 · 奖项 ' + p.tiers.length + ' 档 · 创建于 ' + esc(p.createdAt) + '</div>' +
       '<div class="ops">' +
@@ -299,7 +308,7 @@ function renderProjects(){
     var pid = card.getAttribute('data-id');
     renderRecList(card, pid);
     card.querySelector('.bCopy').addEventListener('click', function(){
-      copyText(projectURL(pid), function(){ toast('链接已复制'); });
+      copyText(projectURL(findProject(pid)), function(){ toast('链接已复制'); });
     });
     card.querySelector('.bToggle').addEventListener('click', function(){ toggleProject(pid); });
     card.querySelector('.bDl').addEventListener('click', function(){ downloadCSV(pid); });
@@ -477,9 +486,10 @@ function runAutotest(){
     out.push('create:' + (p1 && p1.id ? 'OK' : 'BAD'));
     var pid = p1.id;
     out.push('enabled_default:' + (p1.enabled ? 'ON' : 'OFF'));
-    // 2) 生成链接含 ?project=
-    var url = projectURL(pid);
+    // 2) 生成链接含 ?project= 与 cfg 配置
+    var url = projectURL(p1);
     out.push('url:' + (url.indexOf('?project=' + pid) >= 0 ? 'OK' : 'BAD'));
+    out.push('url_cfg:' + (url.indexOf('&cfg=') > 0 ? 'OK' : 'BAD'));
     // 3) 复制函数可执行（内部路径）
     out.push('copy_fn:' + (typeof copyText === 'function' ? 'OK' : 'BAD'));
     // 4) 开启/关闭切换
