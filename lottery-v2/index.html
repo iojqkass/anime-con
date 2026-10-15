@@ -229,6 +229,11 @@ var DEFAULT_PROJECT = {
     ]}
   ]
 };
+/* 内置项目库：带 ?project=ID 时若本地 localStorage 无该项目，则从内置库读取，
+   保证用户端无需先访问后台也能正常抽奖（纯静态架构下的配置兜底） */
+var BUILTIN_PROJECTS = [
+  { id:'pmv96e38tyop', name:'马牌 KOS无惧湿滑抽奖', peopleCount:10, enabled:true, createdAt:'2026-10-15 14:36:43', tiers: JSON.parse(JSON.stringify(DEFAULT_PROJECT.tiers)) }
+];
 var LS_PROJ = 'mapai_projects_v1';
 var LS_REC = 'mapai_records_';
 
@@ -273,8 +278,9 @@ function getDeviceFP(){
 /* ---------- 项目加载 ---------- */
 function loadProjectFromLib(pid){
   var lib = readLS(LS_PROJ);
-  if (!lib) return null;
-  for (var i=0;i<lib.length;i++) if (lib[i].id === pid) return lib[i];
+  if (lib){ for (var i=0;i<lib.length;i++) if (lib[i].id === pid) return lib[i]; }
+  // 本地无该项目时回退内置库（纯静态兜底，保证用户端可用）
+  for (var j=0;j<BUILTIN_PROJECTS.length;j++) if (BUILTIN_PROJECTS[j].id === pid) return JSON.parse(JSON.stringify(BUILTIN_PROJECTS[j]));
   return null;
 }
 function unavailable(msg){
