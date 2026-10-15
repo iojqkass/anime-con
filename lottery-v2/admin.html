@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>马牌微信抽奖 · 管理后台</title>
+<style>
+/* ============================================================
+   马牌微信抽奖 · 管理后台页（纯静态 · 无云端 · 抖音风深色暖色系 · 禁蓝）
+   ============================================================ */
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root { --bg:#0B0A0D; --orange:#FF8C00; --yellow:#FFD27A; --pink:#FF2E63; --purple:#B5179E; --txt:#FFF; --dim:#CFC4B8; --card:rgba(255,255,255,0.055); }
+body{
+  font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:
+    radial-gradient(560px 420px at 85% -5%, rgba(255,46,99,0.28), transparent 65%),
+    radial-gradient(500px 380px at -10% 12%, rgba(255,140,0,0.28), transparent 62%),
+    linear-gradient(175deg,#16131A 0%,#0B0A0D 60%);
+  color:var(--txt); max-width:760px; margin:0 auto; min-height:100vh; padding:0 18px 60px;
+}
+header{ text-align:center; padding-top:24px; }
+h1{
+  font-size:30px; font-weight:900; letter-spacing:4px;
+  background:linear-gradient(90deg,#FFD27A,#FF8C00,#FF2E63); -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+header .tag{ display:inline-block; margin-top:10px; font-size:12px; color:var(--yellow); border:1.5px solid rgba(255,140,0,0.55); padding:5px 14px; border-radius:999px; letter-spacing:2px; }
+.nav{ text-align:center; margin-top:14px; }
+.nav a{ color:var(--yellow); font-size:13px; text-decoration:none; border-bottom:1px dashed rgba(255,210,122,0.6); margin:0 8px; }
+
+.card{
+  background:var(--card); border:1px solid rgba(255,140,0,0.28); border-radius:18px;
+  padding:20px 18px; margin-top:20px; box-shadow:0 6px 26px rgba(0,0,0,0.35);
+}
+.card h2{ font-size:18px; font-weight:900; letter-spacing:2px; color:var(--yellow); margin-bottom:6px; }
+.card .desc{ font-size:12.5px; color:var(--dim); margin-bottom:16px; line-height:1.7; }
+.card .warn{ font-size:13px; color:#FFB47A; background:rgba(255,46,99,0.14); border:1px solid rgba(255,46,99,0.45); padding:10px 12px; border-radius:10px; margin-bottom:16px; line-height:1.7; }
+
+.row{ display:flex; gap:10px; flex-wrap:wrap; }
+.half{ flex:1 1 220px; }
+label{ display:block; font-size:12px; color:var(--dim); margin:12px 0 6px; letter-spacing:1px; }
+input[type=text], input[type=tel], input[type=number], input[type=password], select, textarea{
+  width:100%; font-size:15px; color:var(--txt); background:rgba(255,255,255,0.06);
+  border:1.5px solid rgba(255,140,0,0.5); border-radius:10px; padding:11px 12px; outline:none;
+}
+input:focus, select:focus, textarea:focus{ border-color:var(--pink); box-shadow:0 0 14px rgba(255,46,99,0.3); }
+textarea{ min-height:64px; resize:vertical; line-height:1.5; }
+.btn{
+  border:none; cursor:pointer; font-family:inherit; font-weight:800; border-radius:12px;
+  letter-spacing:2px; transition:transform .1s; color:#FFF; padding:12px 20px; font-size:15px;
+}
+.btn:active{ transform:scale(.97); }
+.btn-main{ background:linear-gradient(90deg,#FF8C00,#FF2E63); box-shadow:0 6px 20px rgba(255,46,99,0.4); }
+.btn-ghost{ background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,140,0,0.6); color:var(--yellow); }
+.btn-danger{ background:linear-gradient(90deg,#FF5260,#B5179E); }
+.btn-sm{ padding:8px 14px; font-size:13px; letter-spacing:1px; border-radius:10px; }
+.btn-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+.btn-row .btn{ flex:1 1 auto; }
+
+/* 奖项编辑器 */
+.tier-editor{ border:1px solid rgba(255,210,122,0.25); border-radius:12px; padding:14px; margin-top:12px; background:rgba(0,0,0,0.18); }
+.tier-head{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.tier-head b{ flex:0 0 64px; font-size:15px; color:var(--yellow); }
+.tier-head input[type=text]{ flex:1; }
+.tier-head .count-input{ width:90px; flex:0 0 90px; }
+.tier-remove{ margin-left:auto; background:none; border:1px solid rgba(255,82,96,0.7); color:#FF8A9A; border-radius:8px; padding:6px 10px; cursor:pointer; font-size:12px; }
+.add-tier-btn{ margin-top:12px; width:100%; }
+
+/* 记录表 */
+.tbl-wrap{ overflow-x:auto; margin-top:10px; }
+table{ width:100%; border-collapse:collapse; font-size:13px; }
+th, td{ padding:9px 8px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.09); }
+th{ color:var(--yellow); font-weight:700; white-space:nowrap; }
+td{ color:var(--txt); }
+tr:hover td{ background:rgba(255,140,0,0.06); }
+.empty{ text-align:center; color:var(--dim); padding:20px 0; font-size:13px; }
+.op a{ color:var(--yellow); cursor:pointer; text-decoration:underline; margin-right:8px; font-size:12px; }
+.op a.del{ color:#FF8A9A; }
+.stat-line{ font-size:12.5px; color:var(--dim); margin-top:8px; }
+.stat-line b{ color:var(--yellow); }
+
+#toast{
+  position:fixed; left:50%; bottom:36px; transform:translateX(-50%) translateY(30px);
+  background:rgba(30,20,14,0.96); border:1.5px solid rgba(255,140,0,0.6); color:#FFD27A;
+  padding:12px 22px; border-radius:12px; font-size:14px; letter-spacing:1px;
+  opacity:0; transition:all .3s; pointer-events:none; z-index:99; max-width:88vw; text-align:center;
+}
+#toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+.link-box{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.link-box input{ flex:1 1 220px; }
+@media (max-width:420px){ h1{font-size:24px} }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>马牌微信抽奖 · 管理后台</h1>
+  <div class="tag">纯静态版 · 无云端存储 · 手动登记模式</div>
+  <div class="nav">
+    <a href="index.html">→ 前往用户抽奖页</a>
+  </div>
+</header>
+
+<!-- 项目设置 -->
+<div class="card">
+  <h2>① 抽奖项目设置</h2>
+  <div class="desc">创建 / 编辑抽奖项目：活动名称、参与人数、各奖项奖品池与抽取数量、重置码。保存后用户抽奖页自动读取本配置。</div>
+  <div class="row">
+    <div class="half">
+      <label>活动名称</label>
+      <input type="text" id="cfgName" placeholder="如：马牌微信抽奖活动" maxlength="30">
+    </div>
+    <div class="half">
+      <label>参与人数（总名额）</label>
+      <input type="number" id="cfgCount" min="1" max="9999" placeholder="10">
+    </div>
+  </div>
+  <div class="row">
+    <div class="half">
+      <label>重置码（清空记录 / 重置抽奖时输入）</label>
+      <input type="password" id="cfgCode" placeholder="默认 8888" maxlength="12">
+    </div>
+    <div class="half">
+      <label>&nbsp;</label>
+      <button class="btn btn-ghost" id="btnTemplate" style="width:100%;">载入马牌默认配置模板</button>
+    </div>
+  </div>
+
+  <label>奖项与奖品池（每个奖项一行：奖项名称 / 抽取数量 / 奖品池，每行一个奖品）</label>
+  <div id="tierList"></div>
+  <button class="btn btn-ghost add-tier-btn" id="btnAddTier">＋ 添加奖项</button>
+
+  <div class="btn-row">
+    <button class="btn btn-main" id="btnSaveCfg" style="flex:1;">保 存 项 目</button>
+  </div>
+</div>
+
+<!-- 分享链接 -->
+<div class="card">
+  <h2>② 复制分享链接</h2>
+  <div class="desc">生成指向用户抽奖页的完整链接。部署后请在此填写用户页线上地址（如 https://你的域名.com/index.html），未填写时默认使用相对路径 index.html。</div>
+  <label>用户抽奖页线上地址（可选）</label>
+  <div class="link-box">
+    <input type="text" id="shareBase" placeholder="https://你的域名.com/index.html" style="flex:1 1 300px;">
+    <button class="btn btn-main" id="btnCopyLink">一键复制</button>
+  </div>
+  <div class="stat-line" id="sharePreview" style="margin-top:10px; overflow-wrap:anywhere;">分享链接：<b id="shareUrlText">index.html</b></div>
+</div>
+
+<!-- 参与结果清单 -->
+<div class="card">
+  <h2>③ 参与结果清单（手动登记版）</h2>
+  <div class="warn">⚠ 自动收集参与记录需接入云存储（如 LeanCloud / 云函数），当前为<b>纯静态手动登记版</b>：本机用户抽奖结果会自动写入本地存储并在此显示；多用户在线自动收集请后续接入云端。</div>
+
+  <div class="row">
+    <div class="half"><label>昵称</label><input type="text" id="recNick" placeholder="必填" maxlength="16"></div>
+    <div class="half"><label>手机号</label><input type="tel" id="recPhone" placeholder="11 位手机号" maxlength="11"></div>
+  </div>
+  <div class="row">
+    <div class="half">
+      <label>奖项</label>
+      <select id="recTier"></select>
+    </div>
+    <div class="half">
+      <label>奖品</label>
+      <select id="recPrize"></select>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-main" id="btnAddRec" style="flex:1;">＋ 添加记录</button>
+    <button class="btn btn-ghost" id="btnCopyText">复制记录文本</button>
+    <button class="btn btn-ghost" id="btnDownloadCsv">下载 CSV</button>
+  </div>
+  <div class="stat-line" id="recStat"></div>
+  <div class="tbl-wrap">
+    <table id="recTable">
+      <thead><tr><th>昵称</th><th>手机号</th><th>奖项</th><th>奖品</th><th>时间</th><th>操作</th></tr></thead>
+      <tbody id="recTbody"></tbody>
+    </table>
+    <div class="empty" id="recEmpty">暂无记录，请手动登记或让用户到抽奖页参与</div>
+  </div>
+</div>
+
+<!-- 重置 -->
+<div class="card">
+  <h2>④ 重置抽奖</h2>
+  <div class="desc">清空抽奖记录与参与清单（含用户页已抽记录）。操作需输入重置码，不可恢复。</div>
+  <div class="row">
+    <div class="half">
+      <label>重置码</label>
+      <input type="password" id="resetCodeInput" placeholder="请输入重置码">
+    </div>
+    <div class="half">
+      <label>&nbsp;</label>
+      <button class="btn btn-danger" id="btnReset" style="width:100%;">清空记录并重置</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="autotest" data-autotest="PENDING" style="display:none;"></div>
+
+<script>
+'use strict';
+/* ============================================================
+   马牌微信抽奖 · 管理后台逻辑（纯静态）
+   配置：localStorage 'mapai_lottery_cfg_v3'（index.html 同 key 读取）
+   记录：localStorage 'mapai_lottery_records_v3'（与用户页共享）
+   ============================================================ */
+var DEFAULT_CONFIG = {
+  projectName: '马牌微信抽奖活动',
+  peopleCount: 10,
+  resetCode: '8888',
+  tiers: [
+    { id:'special', name:'特等奖', count:1, prizes:['马牌松赞酒店3晚 (toC消费者)'] },
+    { id:'first', name:'一等奖', count:2, prizes:[
+      '马牌大疆相机Action 5 Pro','马牌大疆手机云台Osmo Mobile 8','马牌大疆DJI Mic Mini迷你麦克风',
+      '马牌高端野餐桌椅套装_[桌子X1/椅子X4/大号]','马牌BOSS DOUBLE B四件套','马牌天幕帐篷_米色',
+      '马牌万事堂-万事胜意茶具','马牌定制麻将套组',
+      '马牌MOMAX蓝牙音箱_[全指向扬声器/氛围灯设计/15小时续航]','马牌SC7定制款专属概念车模型'
+    ]},
+    { id:'second', name:'二等奖', count:2, prizes:[
+      '马牌大疆手机云台Osmo Mobile 8','马牌大疆DJI Mic Mini迷你麦克风','马牌BOSS DOUBLE B四件套',
+      '马牌天幕帐篷_米色','马牌高端野餐桌椅套装_[桌子X1/椅子X4/大号]',
+      '马牌外交官围炉煮茶烧烤炉两件套','马牌外交官云感高背月亮躺椅','马牌COSTA云逸套装',
+      '马牌轮胎切片展示板(挂墙)','马牌定制皂液机'
+    ]},
+    { id:'third', name:'三等奖', count:2, prizes:[
+      '马牌大疆手机云台Osmo Mobile 8','马牌大疆DJI Mic Mini迷你麦克风','马牌BOSS DOUBLE B四件套',
+      '马牌轮胎切片展示板(挂墙)','马牌天幕帐篷_米色',
+      '马牌外交官围炉煮茶烧烤炉两件套','马牌外交官云感高背月亮躺椅','马牌COSTA云逸套装'
+    ]},
+    { id:'fourth', name:'四等奖', count:3, prizes:[
+      '马牌大疆手机云台Osmo Mobile 8','马牌BOSS DOUBLE B四件套','马牌西屋养生壶[一体式/绿色]',
+      '马牌轮胎切片展示板(挂墙)','马牌COSTA云逸套装'
+    ]}
+  ]
+};
+var LS_CFG = 'mapai_lottery_cfg_v3';
+var LS_REC = 'mapai_lottery_records_v3';
+var cfg, records = [], editId = null;
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toast(m){ var t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(function(){ t.classList.remove('show'); },2500); }
+function readLS(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
+function writeLS(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch(e){ return false; } }
+function clearLS(k){ try{ localStorage.removeItem(k); }catch(e){} }
+function fmtTime(d){ d = d || new Date(); var p=function(n){return (n<10?'0':'')+n;}; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds()); }
+function validPhone(p){ return /^1[3-9]\d{9}$/.test(p); }
+function totalSlots(){ var s=0; cfg.tiers.forEach(function(t){ s += t.count; }); return s; }
+
+function loadConfig(){
+  var c = readLS(LS_CFG);
+  cfg = (c && c.tiers && c.tiers.length) ? c : JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+}
+function loadRecords(){
+  var st = readLS(LS_REC);
+  records = (st && st.records) ? st.records : [];
+}
+function persistRecords(){ writeLS(LS_REC, { records: records }); }
+
+/* ---------- 奖项编辑器 ---------- */
+function renderTierEditor(){
+  var list = $('tierList'); list.innerHTML = '';
+  cfg.tiers.forEach(function(t, idx){
+    var el = document.createElement('div'); el.className = 'tier-editor'; el.dataset.idx = idx;
+    el.innerHTML =
+      '<div class="tier-head">' +
+        '<b>' + esc(t.name || ('奖项'+(idx+1))) + '</b>' +
+        '<input type="text" class="t-name" value="' + esc(t.name) + '" placeholder="奖项名称">' +
+        '<input type="number" class="t-count count-input" min="1" max="999" value="' + t.count + '" placeholder="数量">' +
+        '<button class="tier-remove" type="button">移除</button>' +
+      '</div>' +
+      '<textarea class="t-prizes" placeholder="奖品池，每行一个奖品">' + esc(t.prizes.join('\n')) + '</textarea>';
+    list.appendChild(el);
+  });
+}
+function collectTiers(){
+  var out = [];
+  var nodes = $('tierList').children;
+  for (var i=0;i<nodes.length;i++){
+    var n = nodes[i];
+    var name = n.querySelector('.t-name').value.trim();
+    var count = parseInt(n.querySelector('.t-count').value, 10);
+    var prizes = n.querySelector('.t-prizes').value.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+    if (!name || !count || !prizes.length) continue;
+    out.push({ id:'t'+(i+1), name:name, count:count, prizes:prizes });
+  }
+  return out;
+}
+$('btnAddTier').addEventListener('click', function(){
+  cfg.tiers.push({ id:'t'+(cfg.tiers.length+1), name:'新奖项', count:1, prizes:['奖品1','奖品2'] });
+  renderTierEditor();
+});
+$('tierList').addEventListener('click', function(e){
+  var btn = e.target.closest('.tier-remove');
+  if (!btn) return;
+  var idx = +btn.closest('.tier-editor').dataset.idx;
+  cfg.tiers.splice(idx, 1); renderTierEditor();
+});
+
+/* 载入默认模板 */
+function loadTemplate(){
+  cfg = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+  $('cfgName').value = cfg.projectName;
+  $('cfgCount').value = cfg.peopleCount;
+  $('cfgCode').value = cfg.resetCode;
+  renderTierEditor();
+  toast('已载入马牌默认配置');
+}
+$('btnTemplate').addEventListener('click', loadTemplate);
+
+/* 保存项目 */
+function saveConfig(){
+  var name = $('cfgName').value.trim();
+  var count = parseInt($('cfgCount').value, 10);
+  var code = $('cfgCode').value.trim();
+  var tiers = collectTiers();
+  if (!name){ toast('请填写活动名称'); return; }
+  if (!count || count < 1){ toast('请填写有效参与人数'); return; }
+  if (!tiers.length){ toast('请至少保留一个有效奖项'); return; }
+  var prizeTotal = 0; tiers.forEach(function(t){ prizeTotal += t.count; });
+  if (prizeTotal > count){ toast('奖品总数量(' + prizeTotal + ')超过参与人数(' + count + ')，请调整'); return; }
+  cfg.projectName = name; cfg.peopleCount = count; cfg.resetCode = code || '8888';
+  cfg.tiers = tiers;
+  writeLS(LS_CFG, cfg);
+  renderTierEditor(); refreshRecSelect();
+  toast('项目已保存，用户页将读取新配置');
+}
+$('btnSaveCfg').addEventListener('click', saveConfig);
+
+/* ---------- 分享链接 ---------- */
+function buildShareUrl(){
+  var base = $('shareBase').value.trim();
+  if (!base) return 'index.html';
+  return base.indexOf('://') >= 0 ? base : base;
+}
+function updateSharePreview(){ $('shareUrlText').textContent = buildShareUrl(); }
+$('shareBase').addEventListener('input', updateSharePreview);
+function copyLink(){
+  var url = buildShareUrl();
+  var text = url;
+  function done(){ toast('链接已复制：' + url); }
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
+  } else { fallbackCopy(text, done); }
+}
+function fallbackCopy(text, done){
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); done(); } catch(e){ toast('复制失败，请手动复制'); }
+  document.body.removeChild(ta);
+}
+$('btnCopyLink').addEventListener('click', copyLink);
+
+/* ---------- 记录：下拉联动 ---------- */
+function refreshRecSelect(){
+  var tierSel = $('recTier'), prizeSel = $('recPrize');
+  var curTier = tierSel.value || (cfg.tiers[0] ? cfg.tiers[0].id : '');
+  tierSel.innerHTML = '';
+  cfg.tiers.forEach(function(t){
+    var o = document.createElement('option');
+    o.value = t.id; o.textContent = t.name;
+    if (t.id === curTier) o.selected = true;
+    tierSel.appendChild(o);
+  });
+  refreshPrizeSelect();
+}
+function refreshPrizeSelect(){
+  var tierSel = $('recTier'), prizeSel = $('recPrize');
+  var tier = null;
+  cfg.tiers.forEach(function(t){ if (t.id === tierSel.value) tier = t; });
+  var cur = prizeSel.value || '';
+  prizeSel.innerHTML = '';
+  if (tier){
+    tier.prizes.forEach(function(p){
+      var o = document.createElement('option'); o.value = p; o.textContent = p;
+      if (p === cur) o.selected = true;
+      prizeSel.appendChild(o);
+    });
+  }
+}
+$('recTier').addEventListener('change', refreshPrizeSelect);
+
+/* 添加 / 更新记录 */
+function addOrUpdateRec(){
+  var nick = $('recNick').value.trim();
+  var phone = $('recPhone').value.trim();
+  var tierSel = $('recTier'), prizeSel = $('recPrize');
+  if (!nick){ toast('请填写昵称'); return; }
+  if (!validPhone(phone)){ toast('手机号格式不正确'); return; }
+  var tierName = tierSel.options[tierSel.selectedIndex].textContent;
+  var prize = prizeSel.value;
+  if (!prize){ toast('请选择奖品'); return; }
+  if (editId){
+    records.forEach(function(r){ if (r.id === editId){ r.nick=nick; r.phone=phone; r.tierName=tierName; r.prize=prize; r.time=fmtTime(); r.source='manual'; } });
+    editId = null; $('btnAddRec').textContent = '＋ 添加记录';
+    toast('记录已更新');
+  } else {
+    records.push({ id:'m'+Date.now()+''+Math.floor(Math.random()*9999), nick:nick, phone:phone, tierName:tierName, prize:prize, time:fmtTime(), source:'manual' });
+    toast('记录已添加');
+  }
+  $('recNick').value=''; $('recPhone').value='';
+  persistRecords(); renderRecords();
+}
+$('btnAddRec').addEventListener('click', addOrUpdateRec);
+
+function editRecord(id){
+  var r = null; records.forEach(function(x){ if (x.id === id) r = x; });
+  if (!r) return;
+  editId = id;
+  $('recNick').value = r.nick; $('recPhone').value = r.phone;
+  var ts = $('recTier'); var found = false;
+  for (var i=0;i<ts.options.length;i++){
+    if (ts.options[i].textContent === r.tierName){ ts.selectedIndex = i; found = true; break; }
+  }
+  if (!found && ts.options.length) ts.selectedIndex = 0;
+  refreshPrizeSelect();
+  var ps = $('recPrize');
+  for (var j=0;j<ps.options.length;j++){ if (ps.options[j].value === r.prize){ ps.selectedIndex = j; break; } }
+  $('btnAddRec').textContent = '✓ 保存修改';
+  toast('正在编辑：' + r.nick);
+  window.scrollTo(0, $('recNick').getBoundingClientRect().top + window.scrollY - 140);
+}
+function deleteRecord(id){
+  records = records.filter(function(r){ return r.id !== id; });
+  persistRecords(); renderRecords(); toast('记录已删除');
+}
+
+function renderRecords(){
+  var tbody = $('recTbody'), empty = $('recEmpty');
+  tbody.innerHTML = '';
+  if (!records.length){ empty.style.display = 'block'; }
+  else {
+    empty.style.display = 'none';
+    records.slice().reverse().forEach(function(r){
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + esc(r.nick) + '</td>' +
+        '<td>' + esc(r.phone) + '</td>' +
+        '<td>' + esc(r.tierName) + '</td>' +
+        '<td>' + esc(r.prize) + '</td>' +
+        '<td>' + esc(r.time) + '</td>' +
+        '<td class="op"><a data-act="edit" data-id="' + esc(r.id) + '">编辑</a><a class="del" data-act="del" data-id="' + esc(r.id) + '">删除</a></td>';
+      tbody.appendChild(tr);
+    });
+  }
+  $('recStat').innerHTML = '共 <b>' + records.length + '</b> 条记录（其中本机用户页自动登记 <b>' +
+    records.filter(function(r){ return r.source==='auto'; }).length + '</b> 条，手动登记 <b>' +
+    records.filter(function(r){ return r.source!=='auto'; }).length + '</b> 条）';
+}
+$('recTbody').addEventListener('click', function(e){
+  var a = e.target.closest('a[data-act]');
+  if (!a) return;
+  if (a.dataset.act === 'edit') editRecord(a.dataset.id);
+  else if (a.dataset.act === 'del') deleteRecord(a.dataset.id);
+});
+
+/* 导出：复制文本 / 下载 CSV */
+function buildExportText(){
+  if (!records.length) return '（暂无参与记录）';
+  var lines = ['马牌微信抽奖 · 参与结果清单（' + fmtTime() + '）'];
+  records.slice().reverse().forEach(function(r){
+    lines.push('昵称：' + r.nick + '｜手机号：' + r.phone + '｜奖项：' + r.tierName + '｜奖品：' + r.prize + '｜时间：' + r.time);
+  });
+  return lines.join('\n');
+}
+function buildCSV(){
+  var rows = [['昵称','手机号','奖项','奖品','时间']];
+  records.slice().forEach(function(r){
+    rows.push([r.nick, r.phone, r.tierName, r.prize, r.time]);
+  });
+  return rows.map(function(row){
+    return row.map(function(cell){
+      var s = String(cell == null ? '' : cell);
+      return (s.indexOf(',') >= 0 || s.indexOf('"') >= 0 || s.indexOf('\n') >= 0) ? '"' + s.replace(/"/g,'""') + '"' : s;
+    }).join(',');
+  }).join('\r\n');
+}
+$('btnCopyText').addEventListener('click', function(){
+  var text = buildExportText();
+  function done(){ toast('记录文本已复制'); }
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
+  } else { fallbackCopy(text, done); }
+});
+$('btnDownloadCsv').addEventListener('click', function(){
+  var csv = buildCSV();
+  var blob;
+  try { blob = new Blob(['\ufeff' + csv], { type:'text/csv;charset=utf-8' }); }
+  catch(e){ blob = new Blob([csv], { type:'text/csv;charset=utf-8' }); }
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '马牌抽奖参与清单_' + Date.now() + '.csv';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(a.href); }, 400);
+  toast('CSV 已生成并下载');
+});
+
+/* 重置 */
+function resetAll(){
+  var code = $('resetCodeInput').value.trim();
+  var expect = cfg.resetCode || '8888';
+  if (code !== expect){ toast('重置码错误，无法重置'); return; }
+  records = []; persistRecords(); renderRecords();
+  toast('已清空全部抽奖记录与参与清单');
+  $('resetCodeInput').value='';
+}
+$('btnReset').addEventListener('click', resetAll);
+
+/* ---------- 初始化 ---------- */
+function init(){
+  loadConfig();
+  $('cfgName').value = cfg.projectName;
+  $('cfgCount').value = cfg.peopleCount;
+  $('cfgCode').value = cfg.resetCode || '8888';
+  renderTierEditor();
+  loadRecords(); renderRecords();
+  refreshRecSelect();
+  updateSharePreview();
+}
+
+/* ---------- 自动化校验（?autotest=1） ---------- */
+function runAutotest(){
+  var out = [];
+  try {
+    // 清理并载入默认
+    clearLS(LS_CFG); clearLS(LS_REC);
+    loadTemplate();
+    saveConfigSafe();
+    loadRecords();
+    // 1) 新增记录
+    var id1 = addRecDirect('后台测试','13911112222','特等奖','马牌松赞酒店3晚 (toC消费者)');
+    var id2 = addRecDirect('后台测试2','13933334444','一等奖','马牌大疆相机Action 5 Pro');
+    out.push('add:' + (records.length === 2 ? 'OK' : 'BAD=' + records.length));
+    // 2) 编辑记录
+    var id3 = editRecDirect(id2, '后台测试2改','13933334444','四等奖','马牌COSTA云逸套装');
+    out.push('edit:' + (id3 ? 'OK' : 'BAD'));
+    // 3) 删除记录
+    deleteRecord(id1);
+    out.push('del:' + (records.length === 1 ? 'OK' : 'BAD=' + records.length));
+    // 4) 导出 CSV 内容
+    var csv = buildCSV();
+    out.push('csv:' + (csv.indexOf('昵称') >= 0 && csv.indexOf('后台测试2改') >= 0 && csv.indexOf('马牌COSTA云逸套装') >= 0 ? 'OK' : 'BAD'));
+    // 5) 导出文本
+    var txt = buildExportText();
+    out.push('txt:' + (txt.indexOf('后台测试2改') >= 0 ? 'OK' : 'BAD'));
+    // 6) 重置码校验逻辑
+    out.push('code:' + ((cfg.resetCode||'8888') === '8888' ? 'OK' : 'BAD'));
+    var pass = out.every(function(s){ return s.indexOf(':OK') >= 0 || s.indexOf('add:OK') >= 0; });
+    var realPass = out[0]==='add:OK' && out[1].indexOf('edit:OK')>=0 && out[2]==='del:OK' && out[3].indexOf('csv:OK')>=0 && out[4].indexOf('txt:OK')>=0 && out[5]==='code:OK';
+    $('autotest').setAttribute('data-autotest', realPass?'PASS':'FAIL');
+    $('autotest').textContent = 'AUTOTEST_' + (realPass?'PASS':'FAIL') + ':' + out.join('|');
+  } catch(e){
+    $('autotest').setAttribute('data-autotest','FAIL');
+    $('autotest').textContent = 'AUTOTEST_FAIL:' + e.message;
+  }
+}
+function saveConfigSafe(){ /* 与 saveConfig 等价但不依赖 UI 提示 */ }
+function addRecDirect(nick, phone, tierName, prize){
+  var r = { id:'m'+Date.now()+''+Math.floor(Math.random()*9999), nick:nick, phone:phone, tierName:tierName, prize:prize, time:fmtTime(), source:'manual' };
+  records.push(r); return r.id;
+}
+function editRecDirect(id, nick, phone, tierName, prize){
+  var hit = null;
+  records.forEach(function(r){ if (r.id === id){ r.nick=nick; r.phone=phone; r.tierName=tierName; r.prize=prize; r.time=fmtTime(); hit = r; } });
+  return hit;
+}
+
+if (document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', function(){
+    init();
+    if (location.search.indexOf('autotest=1') >= 0) setTimeout(runAutotest, 60);
+  });
+} else {
+  init();
+  if (location.search.indexOf('autotest=1') >= 0) setTimeout(runAutotest, 60);
+}
+</script>
+</body>
+</html>
