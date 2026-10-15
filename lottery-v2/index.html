@@ -239,6 +239,42 @@ var BUILTIN_PROJECTS = [
 ];
 var LS_PROJ = 'mapai_projects_v1';
 var LS_REC = 'mapai_records_';
+/* Cloudflare Worker 云同步地址（部署后填写，留空则仅本地记录） */
+var CLOUD_API = ''; // 例: https://xxx.workers.dev
+
+/* 精简 cfg 解码：兼容新(单字母)与旧(完整)两种 schema */
+function decodeCfgProject(x){
+  if (!x) return null;
+  if (x.i && x.t){
+    return {
+      id:x.i, name:x.n, peopleCount:(x.p||0), enabled:(x.e !== 0), createdAt:'',
+      tiers:(x.t||[]).map(function(t){ return { name:t.n, count:t.c, prizes:t.z }; })
+    };
+  }
+  return (x.id && x.tiers) ? x : null;
+}
+/* 抽奖记录上报云端（失败静默，不影响本地） */
+function cloudPostRecord(rec){
+  if (!CLOUD_API) return;
+  try{
+    fetch(CLOUD_API + '/api/record', {
+      method:'POST', headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify(rec)
+    }).catch(function(){});
+  }catch(e){}
+}
+/* 云端按设备指纹查记录（用于本地被清后的防重回查） */
+function cloudGetRecordByFP(pid, fp){
+  if (!CLOUD_API) return Promise.resolve(null);
+  return fetch(CLOUD_API + '/api/records?project=' + encodeURIComponent(pid))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (!d || !d.ok || !d.records) return null;
+      for (var i=0;i<d.records.length;i++) if (d.records[i].fp && d.records[i].fp === fp) return d.records[i];
+      return null;
+    })
+    .catch(function(){ return null; });
+}
 
 var project = null, recordKey = '', records = [], remaining = [], busy = false, currentUser = null, deviceFP = '';
 
@@ -311,7 +347,8 @@ function loadProject(){
   var cfg = getQuery('cfg');
   if (cfg){
     try{
-      var proj = JSON.parse(LZString.decompressFromEncodedURIComponent(cfg));
+      var raw = JSON.parse(LZString.decompressFromEncodedURIComponent(cfg));
+      var proj = decodeCfgProject(raw);
       if (proj && proj.id){
         var lib = readLS(LS_PROJ) || [];
         var hit = false;
@@ -329,6 +366,14 @@ function loadProject(){
   // 已抽设备直接显示结果页（同一设备刷新/重开固定结果页）
   var rec = findRecord(deviceFP, '', '');
   if (rec){ showWin(rec.nick || '', rec, true); return; }
+  // 云端防重回查：本地被清但云端仍记录该设备已抽 → 直接锁结果页
+  if (CLOUD_API && deviceFP){
+    cloudGetRecordByFP(project.id, deviceFP).then(function(remote){
+      if (remote && !findRecord(deviceFP, '', '') && document.getElementById('formView').classList.contains('active')){
+        showWin(remote.nick || '', remote, true);
+      }
+    });
+  }
   goView('formView');
 }
 
@@ -376,8 +421,11 @@ function pickSlot(){
 function doDraw(nick, phone){
   var pick = pickSlot();
   if (!pick) return null;
-  var rec = { fp:deviceFP, nick:nick, phone:phone, tierName:pick.tierName, prize:pick.prize, time:fmtTime(), source:'auto' };
+  var rid = 'r' + Date.now().toString(36) + Math.floor(Math.random()*46656).toString(36);
+  var rec = { rid:rid, fp:deviceFP, nick:nick, phone:phone, tierName:pick.tierName, prize:pick.prize, time:fmtTime(), source:'auto' };
   records.push(rec); persist();
+  // 上报云端（Worker 同设备指纹会返回 dup 不覆盖；失败静默不影响本地）
+  cloudPostRecord(Object.assign({ projectId: project.id }, rec));
   return rec;
 }
 function goView(v){

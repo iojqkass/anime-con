@@ -8,6 +8,7 @@
 /* ============================================================
    马牌抽奖管理后台 v2 · 多抽奖项目管理（纯静态 · 手动登记版）
    - 新建抽奖 / 已发布项目列表 / 开关 / 下载CSV / 复制 / 删除
+   - v2.1：分享链接精简 schema（cfg 字段缩名），并接入 Cloudflare Workers + KV 云同步记录
    ============================================================ */
 *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body{
@@ -165,6 +166,40 @@ textarea{ min-height:74px; resize:vertical; line-height:1.5; }
 var LZString=function(){var r=String.fromCharCode,o="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",e={};function t(r,o){if(!e[r]){e[r]={};for(var n=0;n<r.length;n++)e[r][r.charAt(n)]=n}return e[r][o]}var i={compressToBase64:function(r){if(null==r)return"";var n=i._compress(r,6,function(r){return o.charAt(r)});switch(n.length%4){default:case 0:return n;case 1:return n+"===";case 2:return n+"==";case 3:return n+"="}},decompressFromBase64:function(r){return null==r?"":""==r?null:i._decompress(r.length,32,function(n){return t(o,r.charAt(n))})},compressToUTF16:function(o){return null==o?"":i._compress(o,15,function(o){return r(o+32)})+" "},decompressFromUTF16:function(r){return null==r?"":""==r?null:i._decompress(r.length,16384,function(o){return r.charCodeAt(o)-32})},compressToUint8Array:function(r){for(var o=i.compress(r),n=new Uint8Array(2*o.length),e=0,t=o.length;e<t;e++){var s=o.charCodeAt(e);n[2*e]=s>>>8,n[2*e+1]=s%256}return n},decompressFromUint8Array:function(o){if(null==o)return i.decompress(o);for(var n=new Array(o.length/2),e=0,t=n.length;e<t;e++)n[e]=256*o[2*e]+o[2*e+1];var s=[];return n.forEach(function(o){s.push(r(o))}),i.decompress(s.join(""))},compressToEncodedURIComponent:function(r){return null==r?"":i._compress(r,6,function(r){return n.charAt(r)})},decompressFromEncodedURIComponent:function(r){return null==r?"":""==r?null:(r=r.replace(/ /g,"+"),i._decompress(r.length,32,function(o){return t(n,r.charAt(o))}))},compress:function(o){return i._compress(o,16,function(o){return r(o)})},_compress:function(r,o,n){if(null==r)return"";var e,t,i,s={},u={},a="",p="",c="",l=2,f=3,h=2,d=[],m=0,v=0;for(i=0;i<r.length;i+=1)if(a=r.charAt(i),Object.prototype.hasOwnProperty.call(s,a)||(s[a]=f++,u[a]=!0),p=c+a,Object.prototype.hasOwnProperty.call(s,p))c=p;else{if(Object.prototype.hasOwnProperty.call(u,c)){if(c.charCodeAt(0)<256){for(e=0;e<h;e++)m<<=1,v==o-1?(v=0,d.push(n(m)),m=0):v++;for(t=c.charCodeAt(0),e=0;e<8;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;e<h;e++)m=m<<1|t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=c.charCodeAt(0),e=0;e<16;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}0==--l&&(l=Math.pow(2,h),h++),delete u[c]}else for(t=s[c],e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;0==--l&&(l=Math.pow(2,h),h++),s[p]=f++,c=String(a)}if(""!==c){if(Object.prototype.hasOwnProperty.call(u,c)){if(c.charCodeAt(0)<256){for(e=0;e<h;e++)m<<=1,v==o-1?(v=0,d.push(n(m)),m=0):v++;for(t=c.charCodeAt(0),e=0;e<8;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}else{for(t=1,e=0;e<h;e++)m=m<<1|t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t=0;for(t=c.charCodeAt(0),e=0;e<16;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1}0==--l&&(l=Math.pow(2,h),h++),delete u[c]}else for(t=s[c],e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;0==--l&&(l=Math.pow(2,h),h++)}for(t=2,e=0;e<h;e++)m=m<<1|1&t,v==o-1?(v=0,d.push(n(m)),m=0):v++,t>>=1;for(;;){if(m<<=1,v==o-1){d.push(n(m));break}v++}return d.join("")},decompress:function(r){return null==r?"":""==r?null:i._decompress(r.length,32768,function(o){return r.charCodeAt(o)})},_decompress:function(o,n,e){var t,i,s,u,a,p,c,l=[],f=4,h=4,d=3,m="",v=[],g={val:e(0),position:n,index:1};for(t=0;t<3;t+=1)l[t]=t;for(s=0,a=Math.pow(2,2),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;switch(s){case 0:for(s=0,a=Math.pow(2,8),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;c=r(s);break;case 1:for(s=0,a=Math.pow(2,16),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;c=r(s);break;case 2:return""}for(l[3]=c,i=c,v.push(c);;){if(g.index>o)return"";for(s=0,a=Math.pow(2,d),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;switch(c=s){case 0:for(s=0,a=Math.pow(2,8),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;l[h++]=r(s),c=h-1,f--;break;case 1:for(s=0,a=Math.pow(2,16),p=1;p!=a;)u=g.val&g.position,g.position>>=1,0==g.position&&(g.position=n,g.val=e(g.index++)),s|=(u>0?1:0)*p,p<<=1;l[h++]=r(s),c=h-1,f--;break;case 2:return v.join("")}if(0==f&&(f=Math.pow(2,d),d++),l[c])m=l[c];else{if(c!==h)return null;m=i+i.charAt(0)}v.push(m),l[h++]=i+m.charAt(0),i=m,0==--f&&(f=Math.pow(2,d),d++)}}};return i}();"function"==typeof define&&define.amd?define(function(){return LZString}):"undefined"!=typeof module&&null!=module?module.exports=LZString:"undefined"!=typeof angular&&null!=angular&&angular.module("LZString",[]).factory("LZString",function(){return LZString});
 var LS_PROJ = 'mapai_projects_v1';
 var LS_REC = 'mapai_records_';
+/* Cloudflare Worker 云同步地址（部署后填写，留空则纯本地模式） */
+var CLOUD_API = ''; // 例: https://xxx.workers.dev
+/* ---------- 云同步辅助 ---------- */
+function cloudGetRecords(pid){
+  if (!CLOUD_API) return Promise.resolve([]);
+  return fetch(CLOUD_API + '/api/records?project=' + encodeURIComponent(pid))
+    .then(function(r){ return r.json(); })
+    .then(function(d){ return (d && d.ok && d.records) ? d.records : []; })
+    .catch(function(){ return []; });
+}
+function cloudPostRecord(rec){
+  if (!CLOUD_API) return Promise.resolve(null);
+  return fetch(CLOUD_API + '/api/record', {
+    method:'POST', headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify(rec)
+  }).then(function(r){ return r.json(); }).catch(function(){ return null; });
+}
+function cloudDelRecord(project, rid){
+  if (!CLOUD_API) return Promise.resolve(null);
+  return fetch(CLOUD_API + '/api/record?project=' + encodeURIComponent(project) + '&rid=' + encodeURIComponent(rid), { method:'DELETE' })
+    .then(function(r){ return r.json(); }).catch(function(){ return null; });
+}
+function cloudClearProject(project){
+  if (!CLOUD_API) return Promise.resolve(null);
+  return fetch(CLOUD_API + '/api/project?project=' + encodeURIComponent(project) + '&clear=1', { method:'DELETE' })
+    .then(function(r){ return r.json(); }).catch(function(){ return null; });
+}
+/* 合并云端+本地记录（按昵称+手机号去重，云端优先） */
+function mergeRecs(localRecs, cloudRecs){
+  var map = {};
+  (cloudRecs||[]).forEach(function(r){ map[r.nick+'|'+r.phone] = r; });
+  (localRecs||[]).forEach(function(r){ if (!map[r.nick+'|'+r.phone]) map[r.nick+'|'+r.phone] = r; });
+  return Object.keys(map).map(function(k){ return map[k]; });
+}
 var MA_TEMPLATE = {
   name: '马牌微信抽奖活动',
   count: 10,
@@ -255,8 +290,12 @@ function projectURL(p){
   var base = location.href.split('?')[0].split('#')[0];
   // 后台页复制出的链接必须指向用户抽奖页(index.html)，而非后台管理页(admin.html)
   base = base.replace(/(^|\/)admin\.html$/i, '$1index.html');
-  // 项目配置压缩进链接，用户端打开即自动上线，无需重新部署
-  var cfg = LZString.compressToEncodedURIComponent(JSON.stringify(p));
+  // 精简 schema：单字母字段 + 去默认值，cfg 更短（旧完整格式仍可被用户端兼容读取）
+  var slim = {
+    i:p.id, n:p.name, p:p.peopleCount, e:p.enabled?1:0,
+    t:(p.tiers||[]).map(function(t){ return { n:t.name, c:t.count, z:t.prizes }; })
+  };
+  var cfg = LZString.compressToEncodedURIComponent(JSON.stringify(slim));
   return base + '?project=' + p.id + '&cfg=' + cfg;
 }
 function copyText(txt, cb){
@@ -284,7 +323,7 @@ function renderProjects(){
       '<div class="proj-head"><div class="proj-name">' + esc(p.name) + '</div>' + tag + '</div>' +
       '<div class="link-row"><input type="text" readonly value="' + esc(projectURL(p)) + '">' +
         '<button class="btn btn-ghost btn-sm bCopy">复制</button></div>' +
-      '<div class="stat-row">抽奖情况：已抽 <b>' + recs.length + '</b> / 共 ' + p.peopleCount + ' 人 · 奖项 ' + p.tiers.length + ' 档 · 创建于 ' + esc(p.createdAt) + '</div>' +
+      '<div class="stat-row">抽奖情况：已抽 <b>' + recs.length + '</b> / 共 ' + p.peopleCount + ' 人 · 奖项 ' + p.tiers.length + ' 档 · 创建于 ' + esc(p.createdAt) + ' <span class="cloud-badge" style="color:#7CFC00;font-size:12px;"></span></div>' +
       '<div class="ops">' +
         '<button class="btn btn-main btn-sm bToggle">' + (p.enabled ? '停止' : '开启') + '</button>' +
         '<button class="btn btn-ghost btn-sm bDl">下载表单</button>' +
@@ -307,6 +346,7 @@ function renderProjects(){
   el.querySelectorAll('.proj-card').forEach(function(card){
     var pid = card.getAttribute('data-id');
     renderRecList(card, pid);
+    syncCloudInto(card, pid);
     card.querySelector('.bCopy').addEventListener('click', function(){
       copyText(projectURL(findProject(pid)), function(){ toast('链接已复制'); });
     });
@@ -317,29 +357,51 @@ function renderProjects(){
     card.querySelector('.rAdd').addEventListener('click', function(){ addRecord(card, pid); });
   });
 }
-function renderRecList(card, pid){
-  var recs = loadRecords(pid);
+function renderRecList(card, pid, recs){
+  recs = recs || loadRecords(pid);
   var box = card.querySelector('.rec-list');
   if (!recs.length){ box.innerHTML = '<div class="empty">暂无记录</div>'; return; }
   box.innerHTML = recs.map(function(r, i){
-    return '<div class="rec-item" data-i="' + i + '">' +
+    var rid = r.rid || ('r' + i + '_' + pid);
+    return '<div class="rec-item" data-i="' + i + '" data-rid="' + esc(rid) + '">' +
       '<span class="info"><b>' + esc(r.nick) + '</b> · ' + esc(r.phone) + '<br>' +
       esc(r.tierName) + ' / ' + esc(r.prize) + '</span>' +
-      '<span class="meta">' + esc(r.time) + '</span>' +
+      '<span class="meta">' + esc(r.time) + (r.source === 'auto' ? ' · 用户端' : '') + '</span>' +
       '<button class="btn btn-ghost btn-sm rEdit">编辑</button>' +
       '<button class="btn btn-danger btn-sm rDel">删除</button>' +
       '</div>';
   }).join('');
   box.querySelectorAll('.rec-item').forEach(function(item){
-    var i = parseInt(item.getAttribute('data-i'), 10);
+    var rid = item.getAttribute('data-rid');
     item.querySelector('.rDel').addEventListener('click', function(){
-      var recs2 = loadRecords(pid); recs2.splice(i,1); saveRecords(pid, recs2); renderProjects(); toast('记录已删除');
+      var local = loadRecords(pid), idx = -1;
+      for (var j=0;j<local.length;j++) if ((local[j].rid || ('r' + j + '_' + pid)) === rid){ idx = j; break; }
+      var rec = recs[parseInt(item.getAttribute('data-i'), 10)];
+      if (rec && idx < 0){
+        for (var j2=0;j2<local.length;j2++) if (local[j2].nick === rec.nick && local[j2].phone === rec.phone){ idx = j2; break; }
+      }
+      if (idx >= 0){ local.splice(idx,1); saveRecords(pid, local); }
+      cloudDelRecord(pid, rid);
+      renderProjects(); toast('记录已删除');
     });
-    item.querySelector('.rEdit').addEventListener('click', function(){ enterEdit(item, pid, i); });
+    item.querySelector('.rEdit').addEventListener('click', function(){ enterEdit(item, pid, rid); });
   });
 }
-function enterEdit(item, pid, i){
-  var recs = loadRecords(pid), r = recs[i];
+function syncCloudInto(card, pid){
+  cloudGetRecords(pid).then(function(cloud){
+    if (!card.isConnected) return;
+    var merged = mergeRecs(loadRecords(pid), cloud);
+    var stat = card.querySelector('.stat-row');
+    if (stat) stat.innerHTML = stat.innerHTML.replace(/已抽 <b>\d+<\/b>/, '已抽 <b>' + merged.length + '</b>');
+    var badge = card.querySelector('.cloud-badge');
+    if (badge) badge.textContent = cloud.length ? '云端 ' + cloud.length + ' 条' : '';
+    renderRecList(card, pid, merged);
+  });
+}
+function enterEdit(item, pid, rid){
+  var recs = loadRecords(pid), r = null, idx = -1;
+  for (var j=0;j<recs.length;j++) if ((recs[j].rid || ('r' + j + '_' + pid)) === rid){ r = recs[j]; idx = j; break; }
+  if (!r) return;
   var tiers = projects.find(function(p){ return p.id === pid; }).tiers;
   item.classList.add('editing');
   item.innerHTML =
@@ -353,14 +415,21 @@ function enterEdit(item, pid, i){
   item.querySelector('.eCancel').addEventListener('click', function(){ renderProjects(); });
   item.querySelector('.eSave').addEventListener('click', function(){
     var recs2 = loadRecords(pid);
-    recs2[i] = {
+    var recObj = {
+      rid: rid,
       nick:item.querySelector('.eNick').value.trim() || r.nick,
       phone:item.querySelector('.ePhone').value.trim() || r.phone,
       tierName:item.querySelector('.eTier').value,
       prize:item.querySelector('.ePrize').value.trim() || r.prize,
-      time:item.querySelector('.eTime').value.trim() || r.time
+      time:item.querySelector('.eTime').value.trim() || r.time,
+      source: (r.source === 'auto') ? 'auto' : 'manual'
     };
-    saveRecords(pid, recs2); renderProjects(); toast('记录已更新');
+    var hit = false;
+    for (var k=0;k<recs2.length;k++) if ((recs2[k].rid || ('r' + k + '_' + pid)) === rid){ recs2[k] = recObj; hit = true; break; }
+    if (!hit) recs2.push(recObj);
+    saveRecords(pid, recs2);
+    cloudPostRecord(Object.assign({ projectId: pid }, recObj));
+    renderProjects(); toast('记录已更新');
   });
 }
 function addRecord(card, pid){
@@ -371,10 +440,13 @@ function addRecord(card, pid){
   if (!nick || !phone){ toast('昵称与手机号必填'); return; }
   if (!prize) prize = tier;
   var recs = loadRecords(pid);
-  recs.push({ nick:nick, phone:phone, tierName:tier, prize:prize, time:fmtTime() });
+  var rid = 'r' + Date.now().toString(36) + Math.floor(Math.random()*46656).toString(36);
+  var rec = { rid:rid, nick:nick, phone:phone, tierName:tier, prize:prize, time:fmtTime(), source:'manual' };
+  recs.push(rec);
   saveRecords(pid, recs);
+  cloudPostRecord(Object.assign({ projectId: pid }, rec));
   card.querySelector('.rNick').value=''; card.querySelector('.rPhone').value=''; card.querySelector('.rPrize').value='';
-  renderProjects(); toast('记录已添加');
+  renderProjects(); toast('记录已添加' + (CLOUD_API ? '（已同步云端）' : ''));
 }
 
 /* ---------- 项目操作 ---------- */
@@ -405,6 +477,7 @@ function confirmDel(){
   if (code !== p.code){ toast('重置码错误，无法删除'); return; }
   projects = projects.filter(function(x){ return x.id !== deletingId; });
   persistProjects(); localStorage.removeItem(recKey(deletingId));
+  cloudClearProject(deletingId);
   deletingId = null; $('mask').classList.remove('show');
   renderProjects(); toast('项目已删除');
 }
@@ -421,16 +494,24 @@ function buildCSV(pid){
 }
 function downloadCSV(pid){
   var p = projects.find(function(x){ return x.id === pid; });
-  var csv = buildCSV(pid);
-  var name = (p ? p.name : pid) + '_参与记录.csv';
-  try{
-    var blob = new Blob([ '\ufeff' + csv ], { type:'text/csv;charset=utf-8' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a'); a.href = url; a.download = name;
-    document.body.appendChild(a); a.click();
-    setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 300);
-    toast('已导出：' + name);
-  }catch(e){ toast('导出失败，可改用复制 CSV 内容'); }
+  cloudGetRecords(pid).then(function(cloud){
+    var merged = mergeRecs(loadRecords(pid), cloud);
+    var head = '昵称,手机号,奖项,奖品,时间';
+    var lines = merged.map(function(r){
+      function q(s){ s = String(s); return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; }
+      return [q(r.nick), q(r.phone), q(r.tierName), q(r.prize), q(r.time)].join(',');
+    });
+    var csv = head + '\n' + lines.join('\n');
+    var name = (p ? p.name : pid) + '_参与记录.csv';
+    try{
+      var blob = new Blob([ '\ufeff' + csv ], { type:'text/csv;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a'); a.href = url; a.download = name;
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 300);
+      toast('已导出：' + name + '（含云端 ' + cloud.length + ' 条）');
+    }catch(e){ toast('导出失败，可改用复制 CSV 内容'); }
+  });
 }
 
 /* ---------- 事件绑定 ---------- */
