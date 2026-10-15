@@ -246,6 +246,8 @@ function createProject(){
 }
 function projectURL(pid){
   var base = location.href.split('?')[0].split('#')[0];
+  // 后台页复制出的链接必须指向用户抽奖页(index.html)，而非后台管理页(admin.html)
+  base = base.replace(/(^|\/)admin\.html$/i, '$1index.html');
   return base + '?project=' + pid;
 }
 function copyText(txt, cb){
