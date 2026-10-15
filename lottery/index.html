@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>马牌微信抽奖活动</title>
+<style>
+/* ============================================================
+   马牌微信抽奖活动 · 线上版（每人一次 · 抽完即止 · 截图分享）
+   抖音短视频风格：黑底 + 橙黄/粉红/紫红暖色渐变（禁蓝）
+   无外部依赖 · 兼容微信内置浏览器（移动端视口适配）
+   ============================================================ */
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --bg:#0B0A0D;
+  --orange:#FF8C00; --yellow:#FFD27A; --pink:#FF2E63; --purple:#B5179E;
+  --txt:#FFFFFF; --dim:#CFC4B8;
+}
+html,body { height:100%; }
+body {
+  font-family: "PingFang SC","Hiragino Sans GB","Microsoft YaHei","思源黑体",sans-serif;
+  background:
+    radial-gradient(560px 420px at 85% -5%, rgba(255,46,99,0.30), transparent 65%),
+    radial-gradient(500px 380px at -10% 12%, rgba(255,140,0,0.30), transparent 62%),
+    radial-gradient(520px 420px at 50% 115%, rgba(181,23,158,0.26), transparent 65%),
+    linear-gradient(175deg, #16131A 0%, #0B0A0D 60%);
+  color:var(--txt);
+  max-width:520px; margin:0 auto; min-height:100%;
+  padding:0 18px 30px; position:relative;
+  overflow-x:hidden;
+}
+
+/* ---------- 顶部 ---------- */
+header { text-align:center; padding-top:22px; }
+.brand-line { font-size:14px; letter-spacing:6px; color:var(--dim); }
+.main-title {
+  margin-top:10px; font-size:44px; font-weight:900; letter-spacing:3px; line-height:1.2;
+  background:linear-gradient(90deg, #FFD27A 0%, #FF8C00 30%, #FF2E63 68%, #FF8C00 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter:drop-shadow(0 4px 18px rgba(255,46,99,0.45));
+}
+.sub-line {
+  margin-top:8px; display:inline-block; font-size:14px; font-weight:700; color:#FFF;
+  background:linear-gradient(90deg, rgba(255,140,0,0.9), rgba(255,46,99,0.9));
+  padding:6px 18px; border-radius:999px; letter-spacing:2px;
+  box-shadow:0 4px 14px rgba(255,46,99,0.35);
+}
+.progress-line { margin-top:12px; font-size:13px; color:var(--dim); letter-spacing:1px; }
+.progress-line b { color:var(--yellow); }
+
+/* ---------- 视图 ---------- */
+.view { display:none; }
+.view.active { display:block; }
+
+.name-box { text-align:center; margin-top:26px; }
+.name-input {
+  width:100%; font-size:17px; text-align:center; color:var(--txt);
+  background:rgba(255,255,255,0.06); border:2px solid rgba(255,140,0,0.55);
+  border-radius:16px; padding:16px 14px; outline:none;
+}
+.name-input:focus { border-color:var(--pink); box-shadow:0 0 18px rgba(255,46,99,0.35); }
+.name-input::placeholder { color:var(--dim); }
+.name-hint { margin-top:8px; font-size:12px; color:var(--dim); }
+.chips { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:16px; }
+.chip {
+  padding:10px 18px; font-size:15px; border-radius:999px; cursor:pointer; user-select:none;
+  border:1.5px solid rgba(255,140,0,0.5); background:rgba(255,140,0,0.10); color:var(--txt);
+}
+.chip:active { background:rgba(255,46,99,0.25); border-color:var(--pink); }
+.chip.used { opacity:.30; text-decoration:line-through; pointer-events:none; }
+
+.btn {
+  width:100%; border:none; cursor:pointer; font-family:inherit; font-weight:800;
+  border-radius:18px; letter-spacing:3px; transition:transform .1s, filter .1s;
+}
+.btn:active { transform:scale(.97); }
+.btn-start {
+  margin-top:26px; min-height:62px; font-size:24px; color:#FFF;
+  background:linear-gradient(90deg, #FF8C00 0%, #FF2E63 55%, #B5179E 100%);
+  box-shadow:0 10px 30px rgba(255,46,99,0.45), inset 0 1px 0 rgba(255,255,255,0.30);
+  text-shadow:0 2px 6px rgba(0,0,0,0.35);
+}
+.btn-start:disabled { filter:grayscale(.8) brightness(.7); }
+.btn-switch {
+  margin-top:22px; min-height:56px; font-size:18px; color:var(--yellow);
+  border:2px solid rgba(255,140,0,0.7); background:rgba(255,140,0,0.12);
+}
+.btn-gear {
+  position:fixed; right:14px; top:14px; width:44px; height:44px; border-radius:50%;
+  border:1.5px solid rgba(255,255,255,0.25); background:rgba(255,255,255,0.06);
+  color:var(--dim); font-size:20px; cursor:pointer; z-index:50;
+}
+
+/* ---------- 中奖页 ---------- */
+.win-box { text-align:center; margin-top:34px; }
+.win-emoji { font-size:52px; animation:bounce 1.2s ease infinite; display:block; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.win-badge {
+  display:inline-block; margin-top:6px; font-size:13px; letter-spacing:4px; font-weight:700;
+  color:#B5179E; background:#FFD27A; padding:5px 16px; border-radius:999px;
+}
+.win-title {
+  margin-top:18px; font-size:78px; font-weight:900; line-height:1.1; letter-spacing:6px;
+  color:#FFD27A;
+  text-shadow:0 3px 0 #B5179E, 0 6px 0 #FF2E63, 0 10px 30px rgba(255,46,99,0.55);
+}
+.win-name {
+  margin-top:16px; font-size:30px; font-weight:900; letter-spacing:2px;
+  background:linear-gradient(90deg,#FFD27A,#FF8C00,#FF2E63);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.win-tier-sticker {
+  display:inline-block; margin-top:24px; font-size:30px; font-weight:900; color:#0B0A0D;
+  background:#FFF; border:4px solid #FF2E63; border-radius:14px; padding:8px 28px;
+  transform:rotate(-3deg); box-shadow:0 10px 24px rgba(0,0,0,0.5);
+}
+.win-prize {
+  margin-top:18px; font-size:23px; font-weight:800; color:#FFF; line-height:1.5; padding:0 6px;
+  text-shadow:0 2px 12px rgba(255,46,99,0.5);
+  overflow-wrap:anywhere; word-break:break-all;
+}
+.win-already { margin-top:10px; font-size:13px; color:var(--dim); }
+.win-foot { margin-top:22px; font-size:12px; color:var(--dim); }
+
+/* 结束页 */
+.over-box { text-align:center; margin-top:60px; }
+.over-box .t { font-size:36px; font-weight:900; color:#FFD27A; }
+.over-box .s { margin-top:14px; font-size:15px; color:var(--dim); line-height:1.8; }
+
+/* ---------- 抽奖动画层 ---------- */
+#overlay {
+  position:fixed; inset:0; z-index:60; display:none;
+  background:radial-gradient(420px 340px at 50% 38%, rgba(255,140,0,0.30), rgba(11,10,13,0.97) 75%);
+  flex-direction:column; align-items:center; justify-content:center;
+  max-width:520px; margin:0 auto;
+}
+#overlay.show { display:flex; }
+.draw-label { font-size:15px; letter-spacing:6px; color:var(--dim); margin-bottom:14px; }
+#drawAward {
+  font-size:40px; font-weight:900; color:#FFD27A; min-height:56px;
+  text-shadow:0 0 24px rgba(255,140,0,0.6);
+}
+#drawPrize {
+  font-size:26px; font-weight:800; color:#FFF; min-height:44px; margin-top:10px; padding:0 26px;
+  text-align:center; line-height:1.4;
+}
+#drawBox.spinning { animation:shake .35s linear infinite; }
+#drawBox.spinning #drawPrize { animation:flicker .12s linear infinite; }
+@keyframes shake { 10%,90%{transform:translate3d(-3px,1px,0)} 20%,80%{transform:translate3d(5px,-2px,0)} 30%,70%{transform:translate3d(-7px,3px,0)} 40%,60%{transform:translate3d(7px,-3px,0)} 50%{transform:translate3d(-6px,4px,0)} }
+@keyframes flicker { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+/* 定格中奖卡（动画层内） */
+.draw-win { display:none; text-align:center; }
+.draw-win.show { display:block; animation:popBounce .6s cubic-bezier(.2,1.6,.4,1) both; }
+.draw-win .dw-emoji { font-size:66px; }
+.draw-win .dw-title { font-size:56px; font-weight:900; color:#FFD27A; margin-top:8px;
+  text-shadow:0 3px 0 #B5179E, 0 6px 0 #FF2E63, 0 12px 34px rgba(255,46,99,0.6); }
+.draw-win .dw-name { font-size:26px; font-weight:900; margin-top:12px; color:#FFF; }
+.draw-win .dw-tier { display:inline-block; margin-top:18px; font-size:26px; font-weight:900; color:#0B0A0D;
+  background:#FFF; border:3px solid #FF2E63; border-radius:12px; padding:6px 22px; transform:rotate(-3deg); }
+.draw-win .dw-prize { font-size:22px; font-weight:800; margin-top:14px; padding:0 30px; line-height:1.5; }
+@keyframes popBounce { 0%{transform:scale(.25);opacity:0} 55%{transform:scale(1.14)} 75%{transform:scale(.96)} 100%{transform:scale(1);opacity:1} }
+
+/* 闪光层 */
+#flashLayer {
+  position:fixed; inset:0; z-index:65; display:none; pointer-events:none;
+  background:radial-gradient(600px 460px at 50% 45%, rgba(255,255,255,0.95), rgba(255,255,255,0.4) 60%, transparent 85%);
+}
+#flashLayer.flash { display:block; animation:flashout .55s ease-out forwards; }
+@keyframes flashout { 0%{opacity:.95} 100%{opacity:0} }
+
+/* 粒子层 */
+#particleLayer { position:fixed; inset:0; z-index:66; display:none; pointer-events:none; max-width:520px; margin:0 auto; }
+#particleLayer.burst { display:block; }
+.particle {
+  position:absolute; border-radius:50%; opacity:1;
+  animation:floatUp .9s ease-out forwards;
+}
+@keyframes floatUp {
+  0%{ transform:translate(0,0) scale(1); opacity:1; }
+  100%{ transform:translate(var(--dx), -300px) scale(.2); opacity:0; }
+}
+
+/* ---------- 管理弹层 ---------- */
+#modal { position:fixed; inset:0; z-index:80; display:none; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; max-width:520px; margin:0 auto; }
+#modal.show { display:flex; }
+.modal-box {
+  width:88%; max-height:82vh; overflow-y:auto; border-radius:20px;
+  background:linear-gradient(170deg,#241D15,#120E0A); border:2px solid rgba(255,140,0,0.6);
+  padding:20px 18px 24px; box-shadow:0 20px 50px rgba(0,0,0,0.6);
+}
+.modal-box h3 { font-size:18px; font-weight:800; color:#FFD27A; letter-spacing:2px; margin-bottom:14px; }
+.modal-close { float:right; border:none; background:none; color:var(--dim); font-size:20px; cursor:pointer; }
+.modal-box label { display:block; font-size:12px; color:var(--dim); margin:12px 0 6px; }
+.modal-box input[type=number], .modal-box input[type=text], .modal-box textarea {
+  width:100%; background:#1B140C; color:var(--txt); border:1.5px solid rgba(255,140,0,0.45);
+  border-radius:10px; padding:9px 10px; font-size:14px; font-family:inherit; outline:none;
+}
+.modal-box textarea { resize:vertical; line-height:1.5; }
+.modal-box input:focus { border-color:var(--pink); }
+.tier-row { border:1px solid rgba(255,140,0,0.3); border-radius:12px; padding:10px; margin-bottom:10px; background:rgba(0,0,0,0.25); }
+.tier-head { display:flex; gap:8px; align-items:center; }
+.tier-head input:first-child { flex:1; }
+.tier-head .cnt { width:84px; flex:none; }
+.tier-row textarea { margin-top:8px; min-height:70px; font-size:13px; }
+.btn-mini {
+  border:1px solid rgba(255,140,0,0.6); background:rgba(255,140,0,0.12); color:var(--yellow);
+  border-radius:10px; padding:8px 14px; font-size:14px; cursor:pointer; font-family:inherit;
+}
+.btn-mini:active { transform:scale(.96); }
+.btn-del { border-color:rgba(255,60,80,0.6); color:#FF8A9A; background:rgba(255,60,80,0.1); }
+.modal-row { display:flex; gap:10px; margin-top:10px; }
+.modal-row .btn-mini { flex:1; }
+.mtip { font-size:11px; color:var(--dim); margin-top:6px; line-height:1.6; }
+
+/* ---------- toast ---------- */
+#toast {
+  position:fixed; left:50%; bottom:36px; transform:translateX(-50%) translateY(30px);
+  background:rgba(30,20,14,0.96); border:1.5px solid rgba(255,140,0,0.6); color:#FFD27A;
+  padding:12px 22px; border-radius:12px; font-size:14px; letter-spacing:1px;
+  opacity:0; transition:all .3s; pointer-events:none; z-index:99; max-width:86vw; text-align:center;
+}
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+@media (max-width:400px){
+  .main-title { font-size:38px; }
+  .win-title { font-size:64px; }
+  #drawAward { font-size:34px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-line">马牌轮胎 · 微信抽奖</div>
+  <h1 class="main-title">微信抽奖活动</h1>
+  <div class="sub-line">每人 1 次机会 · 抽完即止</div>
+  <div class="progress-line">已抽 <b id="doneCount">0</b> / <b id="slotTotal">10</b> 人</div>
+</header>
+
+<main>
+  <!-- 名字输入视图 -->
+  <div class="view" id="nameView">
+    <div class="name-box">
+      <input class="name-input" id="nameInput" type="text" placeholder="输入你的名字，点“开始抽奖”" maxlength="16" autocomplete="off">
+      <div class="name-hint">也可以点击下面名单快速填入（可手动改名）</div>
+      <div class="chips" id="nameChips"></div>
+      <button class="btn btn-start" id="btnStart">开 始 抽 奖</button>
+      <div class="name-hint" id="nameHint">&nbsp;</div>
+    </div>
+  </div>
+
+  <!-- 中奖页（已抽也停在此，永久停留便于截图） -->
+  <div class="view" id="winView">
+    <div class="win-box">
+      <span class="win-emoji">🎉</span>
+      <div class="win-badge" id="winBadge">恭喜中奖</div>
+      <div class="win-title" id="winTitle">恭喜中奖</div>
+      <div class="win-name" id="winName"></div>
+      <div class="win-tier-sticker" id="winTier"></div>
+      <div class="win-prize" id="winPrize"></div>
+      <div class="win-already" id="winAlready"></div>
+      <button class="btn btn-switch" id="btnSwitch">换 人 抽 奖</button>
+      <div class="win-foot" id="winFoot"></div>
+    </div>
+  </div>
+
+  <!-- 全部抽完视图 -->
+  <div class="view" id="overView">
+    <div class="over-box">
+      <div class="t">🎊 活动结束</div>
+      <div class="s">本次活动的全部奖品名额已抽完。<br>如需开启新一轮，请联系管理员重置。</div>
+    </div>
+  </div>
+</main>
+
+<!-- 管理入口 -->
+<button class="btn-gear" id="btnGear" title="管理员">⚙</button>
+
+<!-- 抽奖动画层 -->
+<div id="overlay">
+  <div id="drawBox">
+    <div class="draw-label">— 抽 奖 中 —</div>
+    <div id="drawAward">&nbsp;</div>
+    <div id="drawPrize">准备中…</div>
+    <div class="draw-win" id="drawWin">
+      <div class="dw-emoji">🎉</div>
+      <div class="dw-title">恭喜中奖</div>
+      <div class="dw-name" id="dwName"></div>
+      <div class="dw-tier" id="dwTier"></div>
+      <div class="dw-prize" id="dwPrize"></div>
+    </div>
+  </div>
+</div>
+
+<div id="flashLayer"></div>
+<div id="particleLayer"></div>
+
+<!-- 管理弹层 -->
+<div id="modal">
+  <div class="modal-box">
+    <button class="modal-close" id="btnModalClose">✕</button>
+    <h3>⚙ 管理员</h3>
+
+    <label>参与人名单数量（生成“参与人1~N”快捷名单）</label>
+    <input type="number" id="setPeopleCount" min="1" max="50">
+
+    <label>奖项与奖品配置（每行一个奖品）</label>
+    <div id="tierEditor"></div>
+    <div class="modal-row">
+      <button class="btn-mini" id="btnAddTier" style="flex:0 0 96px;">+ 新增奖项</button>
+      <button class="btn-mini" id="btnSaveCfg" style="flex:1;">保存配置</button>
+    </div>
+    <div class="mtip">保存配置将按新奖池重建，并清空当前已抽记录（相当于重置活动）。</div>
+
+    <label>重置码（默认 8888，可修改）</label>
+    <input type="text" id="setResetCode" maxlength="12">
+    <div class="modal-row">
+      <button class="btn-mini" id="btnSaveCode">保存重置码</button>
+    </div>
+
+    <label>管理员重置（清空全部已抽记录，活动前清零）</label>
+    <div class="modal-row">
+      <input type="text" id="resetCodeInput" placeholder="输入重置码" style="flex:1;">
+      <button class="btn-mini" id="btnAdminReset" style="color:#FF8A9A;border-color:rgba(255,60,80,0.6);background:rgba(255,60,80,0.1);">确认重置</button>
+    </div>
+    <div class="mtip">重置后所有参与人可重新抽奖，请确保活动前清零。</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<!-- 校验标记（不影响使用） -->
+<div id="selftest" data-selftest="PENDING" style="display:none;"></div>
+<div id="autotest" data-autotest="PENDING" style="display:none;"></div>
+
+<script>
+/* ============================================================
+   马牌微信抽奖 · 线上版逻辑
+   规则：每人一次；打开输入名字 → 开始抽奖 → 动画 → 永久停留中奖页；
+   刷新/再次打开同一名字直接显示中奖页；换人抽奖需点“换人抽奖”；
+   从全局剩余名额（全活动共 10 名额）等概率抽取，抽完即止，同奖项奖品不重复。
+   配置与记录 localStorage 持久化。
+   ============================================================ */
+'use strict';
+
+var DEFAULT_CONFIG = {
+  peopleCount: 10,
+  resetCode: '8888',
+  tiers: [
+    { id:'special', name:'特等奖', count:1, prizes:['松赞酒店3晚 (toC消费者)'] },
+    { id:'first', name:'一等奖', count:2, prizes:[
+      '马牌大疆相机Action 5 Pro','马牌大疆手机云台Osmo Mobile 8','马牌大疆DJI Mic Mini迷你麦克风',
+      '马牌高端野餐桌椅套装_[桌子X1/椅子X4/大号]','马牌BOSS DOUBLE B四件套','马牌天幕帐篷_米色',
+      '马牌万事堂-万事胜意茶具','马牌定制麻将套组',
+      '马牌MOMAX蓝牙音箱_[全指向扬声器/氛围灯设计/15小时续航]','马牌SC7定制款专属概念车模型'
+    ]},
+    { id:'second', name:'二等奖', count:2, prizes:[
+      '马牌大疆手机云台Osmo Mobile 8','马牌大疆DJI Mic Mini迷你麦克风','马牌BOSS DOUBLE B四件套',
+      '马牌天幕帐篷_米色','马牌高端野餐桌椅套装_[桌子X1/椅子X4/大号]',
+      '马牌外交官围炉煮茶烧烤炉两件套','马牌外交官云感高背月亮躺椅','马牌COSTA云逸套装',
+      '马牌轮胎切片展示板(挂墙)','马牌定制皂液机'
+    ]},
+    { id:'third', name:'三等奖', count:2, prizes:[
+      '马牌大疆手机云台Osmo Mobile 8','马牌大疆DJI Mic Mini迷你麦克风','马牌BOSS DOUBLE B四件套',
+      '马牌轮胎切片展示板(挂墙)','马牌天幕帐篷_米色',
+      '马牌外交官围炉煮茶烧烤炉两件套','马牌外交官云感高背月亮躺椅','马牌COSTA云逸套装'
+    ]},
+    { id:'fourth', name:'四等奖', count:3, prizes:[
+      '马牌大疆手机云台Osmo Mobile 8','马牌BOSS DOUBLE B四件套','马牌西屋养生壶[一体式/绿色]',
+      '马牌轮胎切片展示板(挂墙)','马牌COSTA云逸套装'
+    ]}
+  ]
+};
+
+var LS_CONFIG = 'mapai_lottery_config_v2';
+var LS_STATE  = 'mapai_lottery_state_v2';
+
+var config, records = [], remaining = [], busy = false, currentName = '';
+
+function clone(x){ return JSON.parse(JSON.stringify(x)); }
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toast(msg){
+  var t=$('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(function(){ t.classList.remove('show'); }, 2300);
+}
+function readLS(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } }
+function writeLS(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } }
+function clearLS(k){ try { localStorage.removeItem(k); } catch(e){} }
+function fmtTime(){
+  var d=new Date(), p=function(n){ return (n<10?'0':'')+n; };
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
+}
+function totalSlots(){ var s=0; remaining.forEach(function(r){ s+=r.left; }); return s; }
+
+/* ---------- 配置与状态 ---------- */
+function loadConfig(){
+  var c = readLS(LS_CONFIG);
+  config = (c && c.tiers && c.tiers.length) ? c : clone(DEFAULT_CONFIG);
+  if (!c) writeLS(LS_CONFIG, config);
+}
+function loadState(){
+  var st = readLS(LS_STATE);
+  if (st && st.records && st.remaining) {
+    records = st.records;
+    remaining = st.remaining;
+  } else {
+    records = [];
+    remaining = config.tiers.map(function(t){ return { tierId:t.id, tierName:t.name, left:t.count, pool:t.prizes.slice() }; });
+    persistState();
+  }
+}
+function persistState(){
+  writeLS(LS_STATE, { records: records, remaining: remaining });
+}
+function findRecord(name){
+  for (var i=0;i<records.length;i++) if (records[i].name === name) return records[i];
+  return null;
+}
+
+/* ---------- 抽奖核心 ----------
+   从剩余名额等概率抽取（每个名额视为一个 slot），返回 {tierName, prize} 或 null */
+function pickSlot(){
+  var total = 0, i;
+  for (i=0;i<remaining.length;i++) total += remaining[i].left;
+  if (total <= 0) return null;
+  var r = Math.random() * total;
+  for (i=0;i<remaining.length;i++){
+    if (r < remaining[i].left){
+      var rp = remaining[i], pool = rp.pool;
+      if (!pool.length) return null;
+      var idx = Math.floor(Math.random()*pool.length);
+      var prize = pool[idx];
+      rp.left--; pool.splice(idx,1);
+      return { tierName: rp.tierName, prize: prize };
+    }
+    r -= remaining[i].left;
+  }
+  return null;
+}
+
+/* 执行抽奖（记录 + 持久化 + 返回结果） */
+function doDraw(name){
+  var pick = pickSlot();
+  if (!pick) return null;
+  records.push({ name: name, tierName: pick.tierName, prize: pick.prize, time: fmtTime() });
+  persistState();
+  return pick;
+}
+
+/* ---------- 视图切换 ---------- */
+function goView(v){
+  var views = ['nameView','winView','overView'];
+  views.forEach(function(id){ $(id).classList.remove('active'); });
+  if (views.indexOf(v) >= 0) $(v).classList.add('active');
+  if (v !== 'winView') $('winView').classList.remove('active');
+  updateProgress();
+}
+function updateProgress(){
+  $('doneCount').textContent = records.length;
+  $('slotTotal').textContent = config.tiers.reduce(function(s,t){ return s + t.count; }, 0);
+}
+
+/* 名字检查：返回 {already, rec} */
+function checkName(name){
+  var rec = findRecord(name);
+  if (rec) return { already:true, rec:rec };
+  if (totalSlots() <= 0) return { already:false, over:true };
+  return { already:false };
+}
+
+/* 进入名字视图 */
+function goNameView(){
+  $('nameInput').value = '';
+  $('nameHint').textContent = '&nbsp;';
+  renderChips();
+  if (totalSlots() <= 0) {
+    $('nameHint').textContent = '全部奖品名额已抽完，请联系管理员重置';
+  }
+  goView('nameView');
+}
+
+/* ---------- 渲染名单 ---------- */
+function renderChips(){
+  var box = $('nameChips'); box.innerHTML = '';
+  var n = config.peopleCount || 10;
+  for (var i=1;i<=n;i++){
+    var nm = '参与人' + i;
+    var chip = document.createElement('div');
+    chip.className = 'chip' + (findRecord(nm) ? ' used' : '');
+    chip.textContent = nm;
+    chip.addEventListener('click', function(){ $('nameInput').value = this.textContent; });
+    box.appendChild(chip);
+  }
+}
+
+/* ---------- 抽奖动画 ---------- */
+function startDraw(){
+  var name = $('nameInput').value.trim();
+  if (!name){ toast('请先输入名字'); return; }
+  if (busy) return;
+  var chk = checkName(name);
+  if (chk.already){
+    showWin(name, chk.rec, true);
+    toast('该名字已抽过，不可重复抽');
+    return;
+  }
+  if (chk.over){ toast('奖品名额已抽完'); return; }
+
+  busy = true;
+  currentName = name;
+  $('btnStart').disabled = true;
+  // 动画层：商品滚动 + 闪烁 + 震动
+  var ov = $('overlay'), box = $('drawBox');
+  $('drawWin').classList.remove('show');
+  $('drawAward').textContent = '开 奖 中';
+  $('drawPrize').textContent = '准备中…';
+  ov.classList.add('show'); box.classList.add('spinning');
+  // 可选：随机滚动奖项/奖品名
+  var rollTimer = setInterval(function(){
+    var ri = remaining[Math.floor(Math.random()*remaining.length)];
+    if (ri && ri.left > 0){
+      $('drawAward').textContent = ri.tierName;
+      $('drawPrize').textContent = ri.pool.length ? ri.pool[Math.floor(Math.random()*ri.pool.length)] : '';
+    }
+  }, 80);
+
+  setTimeout(function(){
+    clearInterval(rollTimer);
+    box.classList.remove('spinning');
+    // 定格：闪光 + 粒子 + 弹跳中奖卡
+    flashBurst();
+    var pick = doDraw(currentName);
+    if (!pick){
+      box.classList.remove('spinning');
+      ov.classList.remove('show');
+      goNameView(); goView('overView');
+      busy = false; $('btnStart').disabled = false;
+      toast('奖品名额已抽完');
+      return;
+    }
+    $('dwName').textContent = currentName;
+    $('dwTier').textContent = pick.tierName;
+    $('dwPrize').textContent = pick.prize;
+    $('drawWin').classList.add('show');
+    setTimeout(function(){
+      ov.classList.remove('show');
+      showWin(currentName, pick, false);
+      busy = false; $('btnStart').disabled = false;
+    }, 1700);
+  }, 1900);
+}
+
+/* 闪光 + 粒子 */
+function flashBurst(){
+  var fl = $('flashLayer');
+  fl.classList.remove('flash'); void fl.offsetWidth; fl.classList.add('flash');
+  spawnParticles();
+}
+function spawnParticles(){
+  var layer = $('particleLayer');
+  layer.innerHTML = '';
+  var colors = ['#FFD27A','#FF8C00','#FF2E63','#B5179E','#FFF'];
+  for (var i=0;i<20;i++){
+    var p = document.createElement('span');
+    p.className = 'particle';
+    var size = 8 + Math.random()*16;
+    p.style.width = size + 'px'; p.style.height = size + 'px';
+    p.style.left = (46 + Math.random()*8) + '%';
+    p.style.top = (38 + Math.random()*8) + '%';
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.setProperty('--dx', (Math.random()*340 - 170) + 'px');
+    p.style.setProperty('--dy', -(180 + Math.random()*160) + 'px');
+    p.style.boxShadow = '0 0 12px rgba(255,140,0,0.8)';
+    layer.appendChild(p);
+  }
+  layer.classList.add('burst');
+  setTimeout(function(){ layer.classList.remove('burst'); }, 1000);
+}
+
+/* ---------- 中奖页（永久停留） ---------- */
+function showWin(name, rec, already){
+  $('winBadge').textContent = already ? '已抽过 · 不可重复抽' : '恭喜中奖';
+  $('winTitle').textContent = already ? '已抽过啦' : '恭喜中奖';
+  $('winName').textContent = name + ' 抽中';
+  $('winTier').textContent = rec.tierName;
+  $('winPrize').textContent = rec.prize;
+  $('winAlready').textContent = already ? '本页为你的中奖结果，可截图留念。刷新或再次打开仍会显示本页。' : '';
+  $('winFoot').textContent = '开奖时间：' + (rec.time || fmtTime()) + ' · 已抽 ' + records.length + '/' + totalSlots();
+  goView('winView');
+}
+
+/* ---------- 事件 ---------- */
+$('btnStart').addEventListener('click', startDraw);
+$('btnSwitch').addEventListener('click', function(){ goNameView(); });
+$('btnGear').addEventListener('click', function(){
+  $('setPeopleCount').value = config.peopleCount;
+  $('setResetCode').value = config.resetCode;
+  $('resetCodeInput').value = '';
+  renderTierEditor();
+  $('modal').classList.add('show');
+});
+$('btnModalClose').addEventListener('click', function(){ $('modal').classList.remove('show'); });
+$('modal').addEventListener('click', function(e){ if (e.target === this) this.classList.remove('show'); });
+
+/* 设置面板 */
+function renderTierEditor(){
+  var ed = $('tierEditor'); ed.innerHTML = '';
+  config.tiers.forEach(function(t, idx){
+    var isSpecial = (t.id === 'special');
+    var row = document.createElement('div'); row.className = 'tier-row';
+    var head = document.createElement('div'); head.className = 'tier-head';
+    head.innerHTML = '<input type="text" value="' + esc(t.name) + '">' +
+      '<div class="cnt"><input type="number" min="1" max="99" value="' + t.count + '"' + (isSpecial?' disabled title="特等奖固定1个"':'') + '></div>' +
+      (isSpecial ? '' : '<button class="btn-mini btn-del">×</button>');
+    head.querySelector('input[type=text]').addEventListener('change', function(){ t.name = this.value.trim() || t.name; });
+    head.querySelector('input[type=number]').addEventListener('change', function(){ t.count = Math.max(1, parseInt(this.value,10)||1); });
+    var ta = document.createElement('textarea'); ta.rows = 4; ta.value = t.prizes.join('\n');
+    ta.addEventListener('change', function(){ t.prizes = this.value.split('\n').map(function(s){ return s.trim(); }).filter(Boolean); });
+    row.appendChild(head); row.appendChild(ta); ed.appendChild(row);
+    if (!isSpecial) head.querySelector('.btn-del').addEventListener('click', function(){
+      if (config.tiers.length <= 1){ toast('至少保留一个奖项'); return; }
+      config.tiers.splice(idx,1); renderTierEditor();
+    });
+  });
+}
+$('btnAddTier').addEventListener('click', function(){
+  config.tiers.push({ id:'t'+Date.now(), name:'新奖项', count:1, prizes:['奖品A','奖品B'] });
+  renderTierEditor();
+});
+$('btnSaveCfg').addEventListener('click', function(){
+  var pc = parseInt($('setPeopleCount').value, 10);
+  if (!pc || pc < 1 || pc > 50){ toast('人数需在 1-50 之间'); return; }
+  config.peopleCount = pc;
+  if (!confirm('保存配置将按新奖池重建并清空全部已抽记录（相当于重置活动），确定？')) return;
+  writeLS(LS_CONFIG, config);
+  records = [];
+  remaining = config.tiers.map(function(t){ return { tierId:t.id, tierName:t.name, left:t.count, pool:t.prizes.slice() }; });
+  persistState();
+  $('modal').classList.remove('show');
+  goNameView();
+  toast('配置已保存并重置活动');
+});
+$('btnSaveCode').addEventListener('click', function(){
+  var code = $('setResetCode').value.trim();
+  if (!code){ toast('重置码不能为空'); return; }
+  config.resetCode = code;
+  writeLS(LS_CONFIG, config);
+  toast('重置码已更新');
+});
+$('btnAdminReset').addEventListener('click', function(){
+  var code = $('resetCodeInput').value.trim();
+  if (code !== config.resetCode){ toast('重置码错误'); return; }
+  if (!confirm('确认清空全部已抽记录？所有参与人可重新抽奖。')) return;
+  records = [];
+  remaining = config.tiers.map(function(t){ return { tierId:t.id, tierName:t.name, left:t.count, pool:t.prizes.slice() }; });
+  persistState();
+  $('modal').classList.remove('show');
+  goNameView();
+  toast('已重置，活动可重新开始');
+});
+
+/* ---------- 初始化 ---------- */
+function init(){
+  loadConfig();
+  loadState();
+  renderChips();
+  updateProgress();
+  // 打开即进入名字输入视图（若奖品已抽完显示结束页）
+  if (totalSlots() <= 0) goView('overView'); else goNameView();
+}
+
+/* ---------- 自检（核心逻辑） ---------- */
+function selftest(){
+  var pass = 0, fail = 0, msg = '';
+  for (var round=0; round<60; round++){
+    var cfg = clone(DEFAULT_CONFIG);
+    var rem = cfg.tiers.map(function(t){ return { tierId:t.id, tierName:t.name, left:t.count, pool:t.prizes.slice() }; });
+    var got = []; var total = 0;
+    rem.forEach(function(r){ total += r.left; });
+    for (var i=0;i<total;i++){
+      var sum=0; rem.forEach(function(r){ sum+=r.left; });
+      var rr = Math.random()*sum, j;
+      for (j=0;j<rem.length;j++){
+        if (rr < rem[j].left){
+          var pool = rem[j].pool;
+          var idx = Math.floor(Math.random()*pool.length);
+          got.push({ tierId:rem[j].tierId, prize:pool[idx] });
+          rem[j].left--; pool.splice(idx,1); break;
+        }
+        rr -= rem[j].left;
+      }
+    }
+    var leftSum=0; rem.forEach(function(r){ leftSum+=r.left; });
+    var dup=false;
+    cfg.tiers.forEach(function(t){
+      var seen={};
+      got.forEach(function(g){ if (g.tierId===t.id){ if (seen[g.prize]) dup=true; seen[g.prize]=1; } });
+    });
+    if (leftSum===0 && !dup && got.length===10) pass++;
+    else { fail++; msg='round'+round+' left='+leftSum+' dup='+dup+' got='+got.length; break; }
+  }
+  var el=$('selftest');
+  el.setAttribute('data-selftest', fail===0?'OK':'FAIL');
+  el.textContent = fail===0 ? ('SELFTEST_OK:'+pass) : ('SELFTEST_FAIL:'+msg);
+}
+
+/* ---------- 自动化校验（URL 带 ?autotest=1 时执行，验证线上核心流程） ---------- */
+function runAutotest(){
+  var out = [];
+  try {
+    clearLS(LS_CONFIG); clearLS(LS_STATE);
+    loadConfig(); loadState();
+    // 1) 新名字 A 可抽
+    var chkA = checkName('自检员A');
+    out.push('A_can:' + (chkA.already ? 'NO' : 'YES'));
+    // 2) 执行抽奖（直接调用核心，跳过动画）
+    var pickA = doDraw('自检员A');
+    out.push('A_draw:' + (pickA ? pickA.tierName + '/' + pickA.prize : 'NULL'));
+    // 3) 抽完应停留中奖视图
+    showWin('自检员A', { tierName: pickA.tierName, prize: pickA.prize, time: fmtTime() }, false);
+    out.push('view_win:' + ($('winView').classList.contains('active') ? 'YES' : 'NO'));
+    // 4) 模拟刷新：重新载入状态，同一名字进入应显示已抽中奖页
+    loadConfig(); loadState();
+    var chkA2 = checkName('自检员A');
+    out.push('A_recheck:' + (chkA2.already ? 'ALREADY' : 'NOT'));
+    // 5) 新名字 B 仍可抽
+    var chkB = checkName('自检员B');
+    out.push('B_can:' + (chkB.already ? 'NO' : 'YES'));
+    // 判定
+    var pass = out[0]==='A_can:YES' && out[1].indexOf('NULL')<0 && out[2]==='view_win:YES' && out[3]==='A_recheck:ALREADY' && out[4]==='B_can:YES';
+    $('autotest').setAttribute('data-autotest', pass?'PASS':'FAIL');
+    $('autotest').textContent = 'AUTOTEST_' + (pass?'PASS':'FAIL') + ':' + out.join('|');
+  } catch(e){
+    $('autotest').setAttribute('data-autotest','FAIL');
+    $('autotest').textContent = 'AUTOTEST_FAIL:' + e.message;
+  }
+}
+
+if (document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', function(){
+    init(); selftest();
+    if (location.search.indexOf('autotest=1') >= 0) setTimeout(runAutotest, 60);
+  });
+} else {
+  init(); selftest();
+  if (location.search.indexOf('autotest=1') >= 0) setTimeout(runAutotest, 60);
+}
+</script>
+</body>
+</html>
