@@ -290,6 +290,8 @@ function projectURL(p){
   var base = location.href.split('?')[0].split('#')[0];
   // 后台页复制出的链接必须指向用户抽奖页(index.html)，而非后台管理页(admin.html)
   base = base.replace(/(^|\/)admin\.html$/i, '$1index.html');
+  // GitHub Pages 默认加载 index.html：线上省略文件名再短一截；本地 file:// 保留显式文件名
+  if (/^https?:/i.test(base)) base = base.replace(/index\.html$/i, '');
   // 精简 schema：单字母字段 + 去默认值，cfg 更短（旧完整格式仍可被用户端兼容读取）
   var slim = {
     i:p.id, n:p.name, p:p.peopleCount, e:p.enabled?1:0,
